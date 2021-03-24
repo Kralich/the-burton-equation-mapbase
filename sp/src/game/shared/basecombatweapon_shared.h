@@ -359,6 +359,10 @@ public:
 	virtual bool			UsesClipsForAmmo2( void ) const;
 	bool					IsMeleeWeapon() const;
 
+	// Added by 1upD - damage override methods for when you need damage to not be the ammo type's damage
+	virtual float GetDamageOverride() { return 0; }
+	virtual float GetPlayerDamageOverride() { return 0; }
+
 	// derive this function if you mod uses encrypted weapon info files
 	virtual const unsigned char *GetEncryptionKey( void );
 

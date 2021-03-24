@@ -510,3 +510,19 @@ const WeaponProficiencyInfo_t *CWeaponAR2::GetProficiencyValues()
 
 	return proficiencyTable;
 }
+
+//-----------------------------------------------------------------------------
+// OICW Variant
+//-----------------------------------------------------------------------------
+class CWeaponOICW : public CWeaponAR2 {
+	DECLARE_CLASS(CWeaponOICW, CWeaponAR2);
+	DECLARE_SERVERCLASS();
+};
+
+IMPLEMENT_SERVERCLASS_ST(CWeaponOICW, DT_WeaponOICW)
+END_SEND_TABLE()
+
+// Stinger variant of the RPG for the Burton Equation
+LINK_ENTITY_TO_CLASS(weapon_oicw, CWeaponOICW);
+PRECACHE_WEAPON_REGISTER(weapon_oicw);
+

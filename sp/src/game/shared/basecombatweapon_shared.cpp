@@ -2296,6 +2296,15 @@ void CBaseCombatWeapon::PrimaryAttack( void )
 	info.m_flDistance = MAX_TRACE_LENGTH;
 	info.m_iAmmoType = m_iPrimaryAmmoType;
 	info.m_iTracerFreq = 2;
+	info.m_flDamage = GetDamageOverride();
+
+	// If the owner of this weapon is the player, use the player damage override
+	if (GetOwnerEntity()->IsPlayer())
+	{
+		info.m_flDamage = GetPlayerDamageOverride();
+	}
+
+	info.m_iPlayerDamage = GetPlayerDamageOverride();
 
 #if !defined( CLIENT_DLL )
 	// Fire the bullets

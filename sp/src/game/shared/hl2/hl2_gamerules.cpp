@@ -119,6 +119,27 @@ ConVar	sk_plr_dmg_smg1			( "sk_plr_dmg_smg1","0", FCVAR_REPLICATED );
 ConVar	sk_npc_dmg_smg1			( "sk_npc_dmg_smg1","0", FCVAR_REPLICATED);
 ConVar	sk_max_smg1				( "sk_max_smg1","0", FCVAR_REPLICATED);
 
+//TBE Pistol Convars
+ConVar	sk_plr_dmg_luger		( "sk_plr_dmg_luger","0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_luger		( "sk_npc_dmg_luger","0", FCVAR_REPLICATED);
+ConVar	sk_max_luger			( "sk_max_luger","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_usp		( "sk_plr_dmg_usp","0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_usp		( "sk_npc_dmg_usp","0", FCVAR_REPLICATED);
+ConVar	sk_max_usp			( "sk_max_usp","0", FCVAR_REPLICATED);
+//TBE SMG Convars
+ConVar	sk_plr_dmg_mp7			( "sk_plr_dmg_mp7","0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_mp7			( "sk_npc_dmg_mp7","0", FCVAR_REPLICATED);
+ConVar	sk_max_mp7				( "sk_max_mp7","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_mp40			( "sk_plr_dmg_mp40","0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_mp40			( "sk_npc_dmg_mp40","0", FCVAR_REPLICATED);
+ConVar	sk_max_mp40				( "sk_max_mp40","0", FCVAR_REPLICATED);
+
+ConVar	sk_plr_dmg_uzi			( "sk_plr_dmg_uzi","0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_uzi			( "sk_npc_dmg_uzi","0", FCVAR_REPLICATED);
+ConVar	sk_max_uzi				( "sk_max_uzi","0", FCVAR_REPLICATED);
+
 // FIXME: remove these
 //ConVar	sk_plr_dmg_flare_round	( "sk_plr_dmg_flare_round","0", FCVAR_REPLICATED);
 //ConVar	sk_npc_dmg_flare_round	( "sk_npc_dmg_flare_round","0", FCVAR_REPLICATED);
@@ -1801,6 +1822,16 @@ CAmmoDef *GetAmmoDef()
 		def.AddAmmoType("AR2",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_ar2",			"sk_npc_dmg_ar2",			"sk_max_ar2",			BULLET_IMPULSE(200, 1225), 0 );
 		def.AddAmmoType("AlyxGun",			DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_alyxgun",		"sk_npc_dmg_alyxgun",		"sk_max_alyxgun",		BULLET_IMPULSE(200, 1225), 0 );
 		def.AddAmmoType("Pistol",			DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_pistol",		"sk_npc_dmg_pistol",		"sk_max_pistol",		BULLET_IMPULSE(200, 1225), 0 );
+		
+		//TBE Weapon Ammo Types - Pistols
+		def.AddAmmoType("Luger",			DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_luger",			"sk_npc_dmg_luger",			"sk_max_luger",			BULLET_IMPULSE(200, 1225), 0 );
+		def.AddAmmoType("Glock",			DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_glock",			"sk_npc_dmg_glock",			"sk_max_glock",			BULLET_IMPULSE(200, 1225), 0 );
+		def.AddAmmoType("USP",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_usp",			"sk_npc_dmg_usp",			"sk_max_usp",			BULLET_IMPULSE(200, 1225), 0 );
+		//TBE Weapon Ammo Types - SMGs	
+		def.AddAmmoType("MP7",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_mp7",			"sk_npc_dmg_mp7",			"sk_max_mp7",			BULLET_IMPULSE(200, 1225), 0 );
+		def.AddAmmoType("MP40",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_mp40",			"sk_npc_dmg_mp40",			"sk_max_mp40",			BULLET_IMPULSE(200, 1225), 0 );
+		def.AddAmmoType("Uzi",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_uzi",			"sk_npc_dmg_uzi",			"sk_max_uzi",			BULLET_IMPULSE(200, 1225), 0 );		
+		
 		def.AddAmmoType("SMG1",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_smg1",			"sk_npc_dmg_smg1",			"sk_max_smg1",			BULLET_IMPULSE(200, 1225), 0 );
 		def.AddAmmoType("357",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_357",			"sk_npc_dmg_357",			"sk_max_357",			BULLET_IMPULSE(800, 5000), 0 );
 		def.AddAmmoType("XBowBolt",			DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_crossbow",		"sk_npc_dmg_crossbow",		"sk_max_crossbow",		BULLET_IMPULSE(800, 8000), 0 );

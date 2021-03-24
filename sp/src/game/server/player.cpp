@@ -6156,12 +6156,20 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		GiveNamedItem( "weapon_crowbar" );
 		GiveNamedItem( "weapon_pistol" );
 		GiveNamedItem( "weapon_ar2" );
+		GiveNamedItem( "weapon_oicw" );
 		GiveNamedItem( "weapon_shotgun" );
 		GiveNamedItem( "weapon_physcannon" );
 		GiveNamedItem( "weapon_bugbait" );
 		GiveNamedItem( "weapon_rpg" );
 		GiveNamedItem( "weapon_357" );
 		GiveNamedItem( "weapon_crossbow" );
+		GiveNamedItem( "weapon_glock" );
+		GiveNamedItem( "weapon_luger" );
+		GiveNamedItem( "weapon_mp7" );
+		GiveNamedItem( "weapon_mp40" );
+		GiveNamedItem( "weapon_stinger" );
+		GiveNamedItem( "weapon_usp" );
+		GiveNamedItem( "weapon_uzi" );
 #ifdef HL2_EPISODIC
 		// GiveNamedItem( "weapon_magnade" );
 #endif

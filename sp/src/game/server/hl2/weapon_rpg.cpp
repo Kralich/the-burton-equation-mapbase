@@ -2374,3 +2374,18 @@ void CLaserDot::MakeInvisible( void )
 {
 	BaseClass::TurnOff();
 }
+
+//-----------------------------------------------------------------------------
+// Stinger RPG Variant
+//-----------------------------------------------------------------------------
+class CWeaponStinger : public CWeaponRPG {
+	DECLARE_CLASS(CWeaponStinger, CWeaponRPG);
+	DECLARE_SERVERCLASS();
+};
+
+IMPLEMENT_SERVERCLASS_ST(CWeaponStinger, DT_WeaponStinger)
+END_SEND_TABLE()
+
+// Stinger variant of the RPG for the Burton Equation
+LINK_ENTITY_TO_CLASS(weapon_stinger, CWeaponStinger);
+PRECACHE_WEAPON_REGISTER(weapon_stinger);

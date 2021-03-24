@@ -1826,7 +1826,7 @@ void CBasePlayer::SharedSpawn()
 
 	pl.deadflag	= false;
 	m_lifeState	= LIFE_ALIVE;
-	m_iHealth = 100;
+	m_iHealth = 150;
 	m_takedamage		= DAMAGE_YES;
 
 	m_Local.m_bDrawViewmodel = true;

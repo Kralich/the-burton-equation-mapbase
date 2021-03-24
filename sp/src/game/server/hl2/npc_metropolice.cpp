@@ -576,10 +576,6 @@ void CNPC_MetroPolice::Precache( void )
 	{
 		SetModelName( AllocPooledString("models/police_cheaple.mdl" ) );
 	}
-	else
-	{
-		SetModelName( AllocPooledString("models/police.mdl") );
-	}
 
 	PrecacheModel( STRING( GetModelName() ) );
 
@@ -3045,6 +3041,32 @@ Activity CNPC_MetroPolice::NPC_TranslateActivity( Activity newActivity )
 	{
 		newActivity = ACT_IDLE_ANGRY;
 	}
+	    switch (newActivity)
+    {
+    // Handling of AR2 and Shotgun
+    case ACT_RANGE_ATTACK_AR2:            return ACT_RANGE_ATTACK_SMG1;
+
+    case ACT_RANGE_ATTACK_SHOTGUN:        return ACT_RANGE_ATTACK_SMG1;
+    case ACT_RELOAD_SHOTGUN:            return ACT_RELOAD_SMG1;
+    case ACT_IDLE_SHOTGUN_RELAXED:        return ACT_IDLE_SMG1_RELAXED;
+    case ACT_IDLE_SHOTGUN_AGITATED:        return ACT_IDLE_SMG1_STIMULATED;
+    case ACT_IDLE_SHOTGUN_STIMULATED:    return ACT_IDLE_SMG1_STIMULATED;
+    case ACT_IDLE_ANGRY_SHOTGUN:        return ACT_IDLE_ANGRY_SMG1;
+    case ACT_WALK_AIM_SHOTGUN:            return ACT_WALK_AIM_RIFLE;
+    case ACT_RUN_AIM_SHOTGUN:            return ACT_RUN_AIM_RIFLE;
+
+    // Cover activities
+//    case ACT_COVER:                        return ACT_COVER_PISTOL_LOW;
+//    case ACT_COVER_LOW:                    return ACT_COVER_PISTOL_LOW;
+//    case ACT_COVER_MED:                    return ACT_COVER_PISTOL_LOW;
+//    case ACT_RANGE_ATTACK1_LOW:            return ACT_RANGE_ATTACK_PISTOL_LOW;
+    case ACT_RANGE_ATTACK_AR2_LOW:        return ACT_RANGE_ATTACK_SMG1_LOW;
+    case ACT_RANGE_ATTACK_SHOTGUN_LOW:    return ACT_RANGE_ATTACK_SMG1_LOW;
+//    case ACT_RANGE_AIM_LOW:                return ACT_RANGE_AIM_PISTOL_LOW;
+    case ACT_RANGE_AIM_AR2_LOW:            return ACT_RANGE_AIM_SMG1_LOW;
+//    case ACT_RELOAD_LOW:                return ACT_RELOAD_SMG1_LOW;
+    case ACT_RELOAD_SHOTGUN_LOW:        return ACT_RELOAD_SMG1_LOW;
+    }
 
 	return newActivity;
 }
