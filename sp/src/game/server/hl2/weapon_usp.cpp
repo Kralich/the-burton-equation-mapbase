@@ -28,6 +28,8 @@
 #define	PISTOL_ACCURACY_MAXIMUM_PENALTY_TIME	1.5f	// Maximum penalty to deal out
 
 ConVar	usp_use_new_accuracy( "pistol_use_new_accuracy", "1" );
+ConVar	sk_plr_dmg_usp		( "sk_plr_dmg_usp", "0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_usp		( "sk_npc_dmg_usp", "0", FCVAR_REPLICATED );
 
 //-----------------------------------------------------------------------------
 // CWeaponUSP
@@ -103,6 +105,10 @@ public:
 	{
 		return 0.5f; 
 	}
+
+	// Added by 1upD - damage override methods for when you need damage to not be the ammo type's damage
+	virtual float GetDamageOverride();
+	virtual float GetPlayerDamageOverride();
 
 	DECLARE_ACTTABLE();
 
@@ -196,7 +202,8 @@ void CWeaponUSP::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChara
 			CSoundEnt::InsertSound( SOUND_COMBAT|SOUND_CONTEXT_GUNFIRE, pOperator->GetAbsOrigin(), SOUNDENT_VOLUME_PISTOL, 0.2, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy() );
 
 			WeaponSound( SINGLE_NPC );
-			pOperator->FireBullets( 1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED, MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 2 );
+			// 1upD - make sure to add parameters to pOperator->FireBullets to include override damage from the weapon. The two parameters before that are no longer used, they can be 0
+			pOperator->FireBullets( 1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED, MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 2, 0, 0, GetDamageOverride() );
 			pOperator->DoMuzzleFlash();
 			m_iClip1 = m_iClip1 - 1;
 		}
@@ -351,6 +358,17 @@ bool CWeaponUSP::Reload( void )
 	}
 	return fRet;
 }
+
+float CWeaponUSP::GetDamageOverride()
+{
+	return sk_npc_dmg_usp.GetFloat();
+}
+
+float CWeaponUSP::GetPlayerDamageOverride()
+{
+	return sk_plr_dmg_usp.GetFloat();
+}
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 
