@@ -326,14 +326,6 @@ ConVar	sk_plr_dmg_smg1			( "sk_plr_dmg_smg1","0", FCVAR_REPLICATED );
 ConVar	sk_npc_dmg_smg1			( "sk_npc_dmg_smg1","0", FCVAR_REPLICATED);
 ConVar	sk_max_smg1				( "sk_max_smg1","0", FCVAR_REPLICATED);
 
-//TBE Pistol Convars
-ConVar	sk_plr_dmg_luger		( "sk_plr_dmg_luger","0", FCVAR_REPLICATED );
-ConVar	sk_npc_dmg_luger		( "sk_npc_dmg_luger","0", FCVAR_REPLICATED);
-ConVar	sk_max_luger			( "sk_max_luger","0", FCVAR_REPLICATED);
-
-ConVar	sk_plr_dmg_usp		( "sk_plr_dmg_usp","0", FCVAR_REPLICATED );
-ConVar	sk_npc_dmg_usp		( "sk_npc_dmg_usp","0", FCVAR_REPLICATED);
-ConVar	sk_max_usp			( "sk_max_usp","0", FCVAR_REPLICATED);
 //TBE SMG Convars
 ConVar	sk_plr_dmg_mp7			( "sk_plr_dmg_mp7","0", FCVAR_REPLICATED );
 ConVar	sk_npc_dmg_mp7			( "sk_npc_dmg_mp7","0", FCVAR_REPLICATED);
