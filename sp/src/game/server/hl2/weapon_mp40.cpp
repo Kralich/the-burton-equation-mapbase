@@ -23,6 +23,10 @@
 
 extern ConVar    sk_plr_dmg_smg1_grenade;	
 
+ConVar	sk_plr_dmg_mp40		( "sk_plr_dmg_mp40", "0", FCVAR_REPLICATED );
+ConVar	sk_npc_dmg_mp40		( "sk_npc_dmg_mp40", "0", FCVAR_REPLICATED );
+
+
 class CWeaponMP40 : public CHLSelectFireMachineGun
 {
 	DECLARE_DATADESC();
@@ -59,6 +63,10 @@ public:
 	void FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, Vector &vecShootOrigin, Vector &vecShootDir );
 	void Operator_ForceNPCFire( CBaseCombatCharacter  *pOperator, bool bSecondary );
 	void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+	
+	// Added by 1upD - damage override methods for when you need damage to not be the ammo type's damage
+	virtual float GetDamageOverride();
+	virtual float GetPlayerDamageOverride();
 
 	DECLARE_ACTTABLE();
 
@@ -180,8 +188,8 @@ void CWeaponMP40::FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, Vector 
 	WeaponSoundRealtime( SINGLE_NPC );
 
 	CSoundEnt::InsertSound( SOUND_COMBAT|SOUND_CONTEXT_GUNFIRE, pOperator->GetAbsOrigin(), SOUNDENT_VOLUME_MACHINEGUN, 0.2, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy() );
-	pOperator->FireBullets( 1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED,
-		MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 2, entindex(), 0 );
+	// 1upD - make sure to add parameters to pOperator->FireBullets to include override damage from the weapon. The two parameters before that are no longer used, they can be 0
+	pOperator->FireBullets( 1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED, MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 2, 0, 0, GetDamageOverride() );
 
 	pOperator->DoMuzzleFlash();
 	m_iClip1 = m_iClip1 - 1;
@@ -298,6 +306,16 @@ bool CWeaponMP40::Reload( void )
 	}
 
 	return fRet;
+}
+
+float CWeaponMP40::GetDamageOverride()
+{
+	return sk_npc_dmg_MP40.GetFloat();
+}
+
+float CWeaponMP40::GetPlayerDamageOverride()
+{
+	return sk_plr_dmg_MP40.GetFloat();
 }
 
 //-----------------------------------------------------------------------------
