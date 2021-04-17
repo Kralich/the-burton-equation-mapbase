@@ -331,10 +331,6 @@ ConVar	sk_plr_dmg_mp7			( "sk_plr_dmg_mp7","0", FCVAR_REPLICATED );
 ConVar	sk_npc_dmg_mp7			( "sk_npc_dmg_mp7","0", FCVAR_REPLICATED);
 ConVar	sk_max_mp7				( "sk_max_mp7","0", FCVAR_REPLICATED);
 
-ConVar	sk_plr_dmg_mp40			( "sk_plr_dmg_mp40","0", FCVAR_REPLICATED );
-ConVar	sk_npc_dmg_mp40			( "sk_npc_dmg_mp40","0", FCVAR_REPLICATED);
-ConVar	sk_max_mp40				( "sk_max_mp40","0", FCVAR_REPLICATED);
-
 ConVar	sk_plr_dmg_uzi			( "sk_plr_dmg_uzi","0", FCVAR_REPLICATED );
 ConVar	sk_npc_dmg_uzi			( "sk_npc_dmg_uzi","0", FCVAR_REPLICATED);
 ConVar	sk_max_uzi				( "sk_max_uzi","0", FCVAR_REPLICATED);
