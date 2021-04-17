@@ -310,12 +310,12 @@ bool CWeaponMP40::Reload( void )
 
 float CWeaponMP40::GetDamageOverride()
 {
-	return sk_npc_dmg_MP40.GetFloat();
+	return sk_npc_dmg_mp40.GetFloat();
 }
 
 float CWeaponMP40::GetPlayerDamageOverride()
 {
-	return sk_plr_dmg_MP40.GetFloat();
+	return sk_plr_dmg_mp40.GetFloat();
 }
 
 //-----------------------------------------------------------------------------
