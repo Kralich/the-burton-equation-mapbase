@@ -326,15 +326,6 @@ ConVar	sk_plr_dmg_smg1			( "sk_plr_dmg_smg1","0", FCVAR_REPLICATED );
 ConVar	sk_npc_dmg_smg1			( "sk_npc_dmg_smg1","0", FCVAR_REPLICATED);
 ConVar	sk_max_smg1				( "sk_max_smg1","0", FCVAR_REPLICATED);
 
-//TBE SMG Convars
-ConVar	sk_plr_dmg_mp7			( "sk_plr_dmg_mp7","0", FCVAR_REPLICATED );
-ConVar	sk_npc_dmg_mp7			( "sk_npc_dmg_mp7","0", FCVAR_REPLICATED);
-ConVar	sk_max_mp7				( "sk_max_mp7","0", FCVAR_REPLICATED);
-
-ConVar	sk_plr_dmg_uzi			( "sk_plr_dmg_uzi","0", FCVAR_REPLICATED );
-ConVar	sk_npc_dmg_uzi			( "sk_npc_dmg_uzi","0", FCVAR_REPLICATED);
-ConVar	sk_max_uzi				( "sk_max_uzi","0", FCVAR_REPLICATED);
-
 // FIXME: remove these
 //ConVar	sk_plr_dmg_flare_round	( "sk_plr_dmg_flare_round","0", FCVAR_REPLICATED);
 //ConVar	sk_npc_dmg_flare_round	( "sk_npc_dmg_flare_round","0", FCVAR_REPLICATED);
