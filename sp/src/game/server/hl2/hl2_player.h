@@ -363,6 +363,15 @@ protected:
 
 	virtual void		ItemPostFrame();
 	virtual void		PlayUseDenySound();
+	
+	//more kick stuff pls
+	virtual void		HandleKickAttack();
+	virtual void		TraceKickAttack();
+
+	void  HandleKickAnimation( void );
+	void  StartKickAnimation( void );
+
+	virtual void HandleAnimEvent( animevent_t *pEvent );
 
 private:
 	bool				CommanderExecuteOne( CAI_BaseNPC *pNpc, const commandgoal_t &goal, CAI_BaseNPC **Allies, int numAllies );
@@ -405,6 +414,10 @@ private:
 
 	float				m_flNextFlashlightCheckTime;
 	float				m_flFlashlightPowerDrainScale;
+	
+	//kick fields
+	float				m_flNextKickAttack;
+	bool				m_bKickWeaponLowered;
 
 	// Aiming heuristics code
 	float				m_flIdleTime;		//Amount of time we've been motionless
