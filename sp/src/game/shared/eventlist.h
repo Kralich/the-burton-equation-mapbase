@@ -90,6 +90,8 @@ typedef enum
 	AE_NPC_RESPONSE_FORCED,		// Always play a response system concept
 #endif
 
+	AE_KICKATTACK, // For Zach Cop kicks
+
 	LAST_SHARED_ANIMEVENT,
 } Animevent;
 
