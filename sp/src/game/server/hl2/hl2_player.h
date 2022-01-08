@@ -463,5 +463,16 @@ void CHL2_Player::DisableCappedPhysicsDamage()
 	m_bUseCappedPhysicsDamageTable = false;
 }
 
+struct KickInfo_t
+{
+	KickInfo_t(trace_t *_tr, CTakeDamageInfo *_dmgInfo)
+	{
+		tr = _tr;
+		dmgInfo = _dmgInfo;
+	}
+
+	trace_t *tr;
+	CTakeDamageInfo *dmgInfo;
+};
 
 #endif	//HL2_PLAYER_H
