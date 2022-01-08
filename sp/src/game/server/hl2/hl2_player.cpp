@@ -4437,7 +4437,6 @@ void CHL2_Player::TraceKickAttack()
 		}
 
 		// Insert an AI sound so nearby enemies can hear the impact
-		int soundVolume = HL2GameRules()->IsBeastInStealthMode() ? 4096 : 384;
 		CSoundEnt::InsertSound( SOUND_BULLET_IMPACT, tr.endpos, soundVolume, 0.2f, this );
 
 		EmitSound( "EZ2Player.KickHit" );
