@@ -6,6 +6,7 @@
 
 #include "cbase.h"
 #include "hl2_player.h"
+#include "npcevent.h"
 #include "globalstate.h"
 #include "game.h"
 #include "gamerules.h"
