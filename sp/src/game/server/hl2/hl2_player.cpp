@@ -4371,8 +4371,10 @@ void CHL2_Player::HandleKickAttack()
 		punchAng.z = 0.0f;
 		ViewPunch( punchAng );
 
-		// Prevent all attacks for 1 second
+		// Prevent kicking for one second
 		m_flNextKickAttack = gpGlobals->curtime + 1.0f;
+
+		/*// prevent attacking with weapons for 1 second
 		CBaseCombatWeapon * pWeapon = GetActiveWeapon();
 		if ( pWeapon )
 		{
@@ -4391,7 +4393,7 @@ void CHL2_Player::HandleKickAttack()
 				}
 			}
 		}
-
+		*/
 		EmitSound( "EZ2Player.KickSwing" );
 
 		StartKickAnimation();
@@ -4469,7 +4471,8 @@ void CHL2_Player::TraceKickAttack()
 		}
 
 		// Insert an AI sound so nearby enemies can hear the impact
-		CSoundEnt::InsertSound( SOUND_BULLET_IMPACT, tr.endpos, soundVolume, 0.2f, this );
+
+		CSoundEnt::InsertSound( SOUND_BULLET_IMPACT, tr.endpos, 384, 0.2f, this );
 
 		EmitSound( "EZ2Player.KickHit" );
 	}
