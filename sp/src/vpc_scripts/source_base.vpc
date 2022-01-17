@@ -24,6 +24,9 @@ $Conditional MAPBASE_RPC	"1"
 
 // Toggles VScript implementation (note: interfaces still exist, just the provided implementation is not present)
 $Conditional MAPBASE_VSCRIPT	"1"
+
+// Toggles a version of CHL2_Player which supports the Response System
+$Conditional HL2_PLAYER_TALKER	"1"
 //-----------------------------------------------------------------------------
 
 $Configuration "Debug"
