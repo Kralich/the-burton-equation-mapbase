@@ -249,6 +249,10 @@ public:
 	
 	CBasePlayer();
 	~CBasePlayer();
+	//powerup effects
+	CNetworkVar(bool, bInHasteEffect);
+	CNetworkVar(bool, bInDamageEffect);
+
 
 	// IPlayerInfo passthrough (because we can't do multiple inheritance)
 	IPlayerInfo *GetPlayerInfo() { return &m_PlayerInfo; }

@@ -288,6 +288,8 @@ IMPLEMENT_SERVERCLASS_ST(CBaseCombatCharacter, DT_BaseCombatCharacter)
 	SendPropInt( SENDINFO(m_iPowerups), MAX_POWERUPS, SPROP_UNSIGNED ), 
 #endif
 
+
+
 END_SEND_TABLE()
 
 
@@ -2982,7 +2984,9 @@ int CBaseCombatCharacter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 
 		if ( flIntegerDamage <= 0 )
 			return 0;
-
+		CBasePlayer* player = ToBasePlayer(info.GetAttacker());
+		if (player && player->bInDamageEffect)
+			flIntegerDamage *= 2;// Double damage with a damage powerup (tbe_powerup.[h/cpp])
 		m_iHealth -= flIntegerDamage;
 	}
 

@@ -64,6 +64,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+ConVar HastePowerupMult("tbe_powerup_haste_multiplier", "1.5", 0, "how much the haste powerup multiplies sprint speed");
 extern ConVar weapon_showproficiency;
 extern ConVar autoaim_max_dist;
 
@@ -677,6 +678,8 @@ CSuitPowerDevice SuitDeviceCustom[] =
 IMPLEMENT_SERVERCLASS_ST(CHL2_Player, DT_HL2_Player)
 	SendPropDataTable(SENDINFO_DT(m_HL2Local), &REFERENCE_SEND_TABLE(DT_HL2Local), SendProxy_SendLocalDataTable),
 	SendPropBool( SENDINFO(m_fIsSprinting) ),
+	SendPropBool( SENDINFO(bInHasteEffect)),
+	SendPropBool(SENDINFO(bInDamageEffect)),
 END_SEND_TABLE()
 
 
@@ -1652,7 +1655,7 @@ bool CHL2_Player::CanSprint()
 			!IsWalking() &&												// Not if we're walking
 			!( m_Local.m_bDucked && !m_Local.m_bDucking ) &&			// Nor if we're ducking
 			(GetWaterLevel() != 3) &&									// Certainly not underwater
-			(GlobalEntity_GetState("suit_no_sprint") != GLOBAL_ON) );	// Out of the question without the sprint module
+			(GlobalEntity_GetState("suit_no_sprint") != GLOBAL_ON));	// Out of the question without the sprint module
 }
 
 //-----------------------------------------------------------------------------
@@ -1696,8 +1699,12 @@ void CHL2_Player::StartSprinting( void )
 	CPASAttenuationFilter filter( this );
 	filter.UsePredictionRules();
 	EmitSound( filter, entindex(), "HL2Player.SprintStart" );
+	SetMaxSpeed(HL2_SPRINT_SPEED);
+	if (bInHasteEffect)
+	{
+		SetMaxSpeed(HL2_SPRINT_SPEED * HastePowerupMult.GetFloat());
+	}
 
-	SetMaxSpeed( HL2_SPRINT_SPEED );
 	m_fIsSprinting = true;
 }
 
@@ -1713,11 +1720,17 @@ void CHL2_Player::StopSprinting( void )
 
 	if( IsSuitEquipped() )
 	{
-		SetMaxSpeed( HL2_NORM_SPEED );
+		if(bInHasteEffect)
+			{SetMaxSpeed( HL2_NORM_SPEED * HastePowerupMult.GetFloat());}
+		else
+			{SetMaxSpeed( HL2_NORM_SPEED );}
 	}
 	else
 	{
-		SetMaxSpeed( HL2_WALK_SPEED );
+		if(bInHasteEffect)
+			{SetMaxSpeed( HL2_WALK_SPEED * HastePowerupMult.GetFloat());}
+		else
+			{SetMaxSpeed( HL2_WALK_SPEED );}
 	}
 
 	m_fIsSprinting = false;
@@ -1749,7 +1762,11 @@ void CHL2_Player::EnableSprint( bool bEnable )
 //-----------------------------------------------------------------------------
 void CHL2_Player::StartWalking( void )
 {
-	SetMaxSpeed( HL2_WALK_SPEED );
+	if(bInHasteEffect)
+		{SetMaxSpeed( HL2_WALK_SPEED * HastePowerupMult.GetFloat());}
+	else
+		{SetMaxSpeed( HL2_WALK_SPEED );}
+
 	m_fIsWalking = true;
 }
 
@@ -1757,7 +1774,10 @@ void CHL2_Player::StartWalking( void )
 //-----------------------------------------------------------------------------
 void CHL2_Player::StopWalking( void )
 {
-	SetMaxSpeed( HL2_NORM_SPEED );
+	if(bInHasteEffect)
+		{SetMaxSpeed( HL2_NORM_SPEED * HastePowerupMult.GetFloat());}
+	else
+		{SetMaxSpeed( HL2_NORM_SPEED );}
 	m_fIsWalking = false;
 }
 

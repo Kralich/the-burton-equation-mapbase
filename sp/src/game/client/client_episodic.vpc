@@ -127,6 +127,11 @@ $Project "Client (Episodic)"
 			$File	"hl2\vgui_rootpanel_hl2.cpp"
 			$File	"episodic\c_npc_puppet.cpp"
 		}
+		$Folder "The Burton Equation"
+		{
+				$File "$SRCDIR\game\shared\tbe\tbe_powerup.cpp"
+				$File "$SRCDIR\game\shared\tbe\tbe_powerup.h"
+		}
 	}
 	
 }

@@ -23,6 +23,8 @@
 class CAI_Squad;
 class CPropCombineBall;
 
+
+
 extern int TrainSpeed(int iSpeed, int iMax);
 extern void CopyToBodyQue( CBaseAnimating *pCorpse );
 
@@ -110,6 +112,9 @@ public:
 
 	DECLARE_SERVERCLASS();
 	DECLARE_DATADESC();
+
+
+
 
 	virtual void		CreateCorpse( void ) { CopyToBodyQue( this ); };
 

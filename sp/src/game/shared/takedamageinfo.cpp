@@ -9,6 +9,7 @@
 #include "takedamageinfo.h"
 #include "ammodef.h"
 
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -85,6 +86,10 @@ BEGIN_SCRIPTDESC_ROOT( CTakeDamageInfo, "Damage information handler." )
 END_SCRIPTDESC();
 #endif
 
+
+
+ConVar DamagePowerupMult("tbe_powerup_damgage_multiplier", "2", 0, "how much the damage powerup multiplies damage");
+
 void CTakeDamageInfo::Init( CBaseEntity *pInflictor, CBaseEntity *pAttacker, CBaseEntity *pWeapon, const Vector &damageForce, const Vector &damagePosition, const Vector &reportedPosition, float flDamage, int bitsDamageType, int iCustomDamage )
 {
 	m_hInflictor = pInflictor;
@@ -98,15 +103,23 @@ void CTakeDamageInfo::Init( CBaseEntity *pInflictor, CBaseEntity *pAttacker, CBa
 	}
 
 	m_hWeapon = pWeapon;
-
-	m_flDamage = flDamage;
-
+	CBasePlayer* player = ToBasePlayer(pAttacker);
+	if (player)
+	{
+		m_flDamage		= player->bInDamageEffect ? (flDamage * DamagePowerupMult.GetFloat()) : flDamage;
+		m_flMaxDamage	= player->bInDamageEffect ? (flDamage * DamagePowerupMult.GetFloat()) : flDamage;
+	}
+	else
+	{
+		m_flDamage = flDamage;
+		m_flMaxDamage = flDamage;
+	}
 	m_flBaseDamage = BASEDAMAGE_NOT_SPECIFIED;
 
 	m_bitsDamageType = bitsDamageType;
 	m_iDamageCustom = iCustomDamage;
 
-	m_flMaxDamage = flDamage;
+
 	m_vecDamageForce = damageForce;
 	m_vecDamagePosition = damagePosition;
 	m_vecReportedPosition = reportedPosition;

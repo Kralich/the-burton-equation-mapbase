@@ -264,6 +264,7 @@ $Project "Server (HL2)"
 				$File	"hl2\weapon_flaregun.cpp"
 				$File	"hl2\weapon_flaregun.h"
 			}
+			
 		}
 	}
 }

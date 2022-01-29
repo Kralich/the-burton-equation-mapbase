@@ -408,6 +408,9 @@ protected:
 
 public:
 	int m_StuckLast;
+	//powerup effects
+	bool				bInHasteEffect = false;
+	bool				bInDamageEffect = false;
 	
 	// Data for only the local player
 	CNetworkVarEmbedded( CPlayerLocalData, m_Local );

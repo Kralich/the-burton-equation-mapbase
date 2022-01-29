@@ -307,5 +307,12 @@ $Project "Server (Episodic)"
 				$File	"hl2\weapon_flaregun.h"
 			}
 		}
+		$Folder "The Burton Equation"
+		{
+				$File "$SRCDIR\game\shared\tbe\tbe_powerup.cpp"
+				$File "$SRCDIR\game\shared\tbe\tbe_powerup.h"
+		}
+		
+
 	}
 }
