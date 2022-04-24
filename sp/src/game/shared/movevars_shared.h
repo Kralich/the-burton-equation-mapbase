@@ -19,6 +19,7 @@ extern ConVar sv_stopspeed;
 extern ConVar sv_noclipaccelerate;
 extern ConVar sv_noclipspeed;
 extern ConVar sv_maxspeed;
+extern ConVar sv_maxnoclipspeed;
 extern ConVar sv_accelerate;
 extern ConVar sv_airaccelerate;
 extern ConVar sv_wateraccelerate;

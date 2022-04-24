@@ -2263,7 +2263,7 @@ void CGameMovement::FullNoClipMove( float factor, float maxacceleration )
 	Vector forward, right, up;
 	Vector wishdir;
 	float wishspeed;
-	float maxspeed = sv_maxspeed.GetFloat() * factor;
+	float maxspeed = sv_maxnoclipspeed.GetFloat() * factor;
 
 	AngleVectors (mv->m_vecViewAngles, &forward, &right, &up);  // Determine movement angles
 
