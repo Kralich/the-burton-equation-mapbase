@@ -250,6 +250,10 @@ public:
 	virtual int SelectSchedule( void );
 	virtual int TranslateSchedule( int scheduleType );
 
+#ifdef MAPBASE
+	Activity	NPC_TranslateActivity( Activity eNewActivity );
+#endif
+
 	bool KeyValue( const char *szKeyName, const char *szValue );
 
 	void PrescheduleThink( void );
@@ -936,6 +940,14 @@ void CProtoSniper::OnScheduleChange( void )
 {
 	LaserOff();
 
+#ifdef MAPBASE
+	if ( m_bKilledPlayer && HasCondition( COND_SEE_PLAYER ) )
+	{
+		// IMPOSSIBLE! (possible when SP respawn is enabled)
+		m_bKilledPlayer = false;
+	}
+#endif
+
 	BaseClass::OnScheduleChange();
 }
 
@@ -1519,6 +1531,8 @@ void CProtoSniper::Event_Killed( const CTakeDamageInfo &info )
 void CProtoSniper::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &info )
 {
 #ifdef MAPBASE
+	BaseClass::Event_KilledOther( pVictim, info );
+
 	if (pVictim == GetEnemy())
 		SetCondition(COND_SNIPER_KILLED_ENEMY);
 #endif
@@ -2033,6 +2047,23 @@ int CProtoSniper::TranslateSchedule( int scheduleType )
 	}
 	return BaseClass::TranslateSchedule( scheduleType );
 }
+
+#ifdef MAPBASE
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+Activity CProtoSniper::NPC_TranslateActivity( Activity eNewActivity )
+{
+	// ACT_IDLE is now just the soldier's unarmed idle animation.
+	// Use a gun-holding animation like what unhidden snipers were using before.
+	if (!HasSpawnFlags( SF_SNIPER_HIDDEN ) && eNewActivity == ACT_IDLE)
+	{
+		eNewActivity = ACT_IDLE_SMG1;
+	}
+
+	return BaseClass::NPC_TranslateActivity( eNewActivity );
+}
+#endif
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -3416,6 +3447,18 @@ AI_BEGIN_CUSTOM_NPC( proto_sniper, CProtoSniper )
 
 	//=========================================================
 	//=========================================================
+#ifdef MAPBASE
+	DEFINE_SCHEDULE
+	(
+	SCHED_PSNIPER_PLAYER_DEAD,
+
+	"	Tasks"
+	"		TASK_SNIPER_PLAYER_DEAD		0"
+	"	"
+	"	Interrupts"
+	"		COND_SEE_PLAYER"
+	)
+#else
 	DEFINE_SCHEDULE
 	(
 	SCHED_PSNIPER_PLAYER_DEAD,
@@ -3425,6 +3468,7 @@ AI_BEGIN_CUSTOM_NPC( proto_sniper, CProtoSniper )
 	"	"
 	"	Interrupts"
 	)
+#endif
 
 AI_END_CUSTOM_NPC()
 
