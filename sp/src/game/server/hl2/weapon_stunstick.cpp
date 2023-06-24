@@ -379,7 +379,7 @@ class CWeaponBillyclub : public CWeaponStunStick {
 	DECLARE_SERVERCLASS();
 };
 
-IMPLEMENT_SERVERCLASS_ST(CWeaponBillyclub, DT_WeaponShovel)
+IMPLEMENT_SERVERCLASS_ST(CWeaponBillyclub, DT_WeaponBillyclub)
 END_SEND_TABLE()
 
 LINK_ENTITY_TO_CLASS(weapon_billyclub, CWeaponBillyclub);
