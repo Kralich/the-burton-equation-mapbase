@@ -174,6 +174,19 @@ void CBaseCombatWeapon::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseComb
 				WeaponSound( (WeaponSound_t)iSnd );
 			}
 		}
+
+		else if (pEvent->event == AE_WPN_RELOAD) {
+			FinishReload();
+			return;
+		}
+		else if (pEvent->event == AE_WPN_DRAWN) {
+			m_bDrawFramesOver = true;
+			m_flNextPrimaryAttack = gpGlobals->curtime;
+			m_flNextSecondaryAttack = gpGlobals->curtime;
+			return;
+		}
+
+
 	}
 
 	DevWarning( 2, "Unhandled animation event %d from %s --> %s\n", pEvent->event, pOperator->GetClassname(), GetClassname() );

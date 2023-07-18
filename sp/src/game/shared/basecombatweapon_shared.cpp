@@ -1725,6 +1725,8 @@ selects and deploys each weapon as you pass it. (sjb)
 
 	SetContextThink( NULL, 0, HIDEWEAPON_THINK_CONTEXT );
 
+	m_bDrawFramesOver = false;
+
 	return true;
 }
 
@@ -2252,6 +2254,10 @@ void CBaseCombatWeapon::HandleFireOnEmpty()
 void CBaseCombatWeapon::ItemBusyFrame( void )
 {
 	UpdateAutoFire();
+	if (m_bDrawFramesOver) {
+		ItemPostFrame(); // arbabf: if you read this you have all right to come to my house and shoot me for this	
+		// this completely just bypasses ItemBusyFrame so if you want to be busy when the draw frames are over good luck bucko	
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -295,6 +295,7 @@ public:
 	virtual void			Detach() {}
 
 	// Weapon behaviour
+	bool					m_bDrawFramesOver = false;
 	virtual void			ItemPreFrame( void );					// called each frame by the player PreThink
 	virtual void			ItemPostFrame( void );					// called each frame by the player PostThink
 	virtual void			ItemBusyFrame( void );					// called each frame by the player PostThink, if the player's not ready to attack yet
