@@ -49,6 +49,9 @@ STUB_WEAPON_CLASS( weapon_nightstick, WeaponNightstick, C_BaseHLBludgeonWeapon )
 STUB_WEAPON_CLASS( weapon_slam, Weapon_SLAM, C_BaseHLCombatWeapon );
 #endif
 STUB_WEAPON_CLASS( weapon_crowbar, WeaponCrowbar, C_BaseHLBludgeonWeapon );
+STUB_WEAPON_CLASS( weapon_billyclub, WeaponBillyclub, C_BaseHLBludgeonWeapon );
+STUB_WEAPON_CLASS( weapon_shovel, WeaponShovel, C_BaseHLBludgeonWeapon );
+STUB_WEAPON_CLASS( weapon_nightstick, WeaponNightstick, C_BaseHLBludgeonWeapon );
 #ifdef HL2_EPISODIC
 STUB_WEAPON_CLASS( weapon_hopwire, WeaponHopwire, C_BaseHLCombatWeapon );
 //STUB_WEAPON_CLASS( weapon_proto1, WeaponProto1, C_BaseHLCombatWeapon );
