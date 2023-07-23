@@ -370,3 +370,4 @@ bool CWeaponStunStick::GetStunState( void )
 {
 	return m_bActive;
 }
+

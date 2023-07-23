@@ -224,3 +224,45 @@ void CWeaponCrowbar::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatC
 		break;
 	}
 }
+
+//-----------------------------------------------------------------------------
+// Billyclub Variant
+//-----------------------------------------------------------------------------
+class CWeaponBillyclub : public CWeaponCrowbar {
+	DECLARE_CLASS(CWeaponBillyclub, CWeaponCrowbar);
+	DECLARE_SERVERCLASS();
+};
+
+IMPLEMENT_SERVERCLASS_ST(CWeaponBillyclub, DT_WeaponBillyclub)
+END_SEND_TABLE()
+
+LINK_ENTITY_TO_CLASS(weapon_billyclub, CWeaponBillyclub);
+PRECACHE_WEAPON_REGISTER(weapon_billyclub);
+
+//-----------------------------------------------------------------------------
+// Shovel Variant
+//-----------------------------------------------------------------------------
+class CWeaponShovel : public CWeaponCrowbar {
+	DECLARE_CLASS(CWeaponShovel, CWeaponCrowbar);
+	DECLARE_SERVERCLASS();
+};
+
+IMPLEMENT_SERVERCLASS_ST(CWeaponShovel, DT_WeaponShovel)
+END_SEND_TABLE()
+
+LINK_ENTITY_TO_CLASS(weapon_shovel, CWeaponShovel);
+PRECACHE_WEAPON_REGISTER(weapon_shovel);
+
+//-----------------------------------------------------------------------------
+// Nightstick Variant
+//-----------------------------------------------------------------------------
+class CWeaponNightstick : public CWeaponCrowbar {
+	DECLARE_CLASS(CWeaponNightstick, CWeaponCrowbar);
+	DECLARE_SERVERCLASS();
+};
+
+IMPLEMENT_SERVERCLASS_ST(CWeaponNightstick, DT_WeaponNightstick)
+END_SEND_TABLE()
+
+LINK_ENTITY_TO_CLASS(weapon_nightstick, CWeaponNightstick);
+PRECACHE_WEAPON_REGISTER(weapon_nightstick);
