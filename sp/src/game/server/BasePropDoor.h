@@ -81,6 +81,10 @@ public:
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );
 #endif
 
+	bool	HandleInteraction( int interactionType, void *data, CBaseCombatCharacter* sourceEnt );
+	bool	KickOpen( CBaseEntity * pSourceEnt );
+	void	InputKickOpen( inputdata_t &inputdata );
+
 protected:
 
 	enum DoorState_t
@@ -110,6 +114,13 @@ protected:
 	inline Activity GetNPCOpenFrontActivity() { return m_eNPCOpenFrontActivity; }
 	inline Activity GetNPCOpenBackActivity() { return m_eNPCOpenBackActivity; }
 #endif
+
+	float	m_flKickSpeed;
+	bool	m_bOpenOnKick;
+	bool	m_bUnlockOnKick;
+	bool	m_bKicked;
+
+	virtual bool CanOpenOnKick( CBaseEntity * pEntity ) { return m_bOpenOnKick; }
 
 private:
 
@@ -231,6 +242,7 @@ private:
 	COutputEvent m_OnClose;					// Triggered when the door is told to close.
 	COutputEvent m_OnOpen;					// Triggered when the door is told to open.
 	COutputEvent m_OnLockedUse;				// Triggered when the user tries to open a locked door.
+	COutputEvent m_OnKicked;
 };
 
 
