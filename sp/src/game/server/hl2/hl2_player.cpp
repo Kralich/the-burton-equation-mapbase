@@ -4377,7 +4377,7 @@ void CHL2_Player::HandleKickAttack()
 			}
 		}
 		*/
-		EmitSound( "EZ2Player.KickSwing" );
+		EmitSound( "TBEPlayer.KickSwing" );
 
 		StartKickAnimation();
 	}
@@ -4457,11 +4457,11 @@ void CHL2_Player::TraceKickAttack()
 
 		CSoundEnt::InsertSound( SOUND_BULLET_IMPACT, tr.endpos, 384, 0.2f, this );
 
-		EmitSound( "EZ2Player.KickHit" );
+		EmitSound( "TBEPlayer.KickHit" );
 	}
 	else
 	{
-		EmitSound( "EZ2Player.KickMiss" );
+		EmitSound( "TBEPlayer.KickMiss" );
 	}
 }
 
