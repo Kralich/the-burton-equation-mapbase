@@ -4399,7 +4399,7 @@ void CHL2_Player::HandleKickAttack()
 static const Vector g_kickMins( -KICK_HULL_DIM, -KICK_HULL_DIM, -KICK_HULL_DIM );
 static const Vector g_kickMaxs( KICK_HULL_DIM, KICK_HULL_DIM, KICK_HULL_DIM );
 
-void CHL2_Player::TraceKickAttack()
+void CHL2_Player::TraceKickAttack( CBaseEntity* pKickedEntity )
 {
 	Vector vecSrc = GetFlags() & FL_DUCKING ? EyePosition() : EyePosition() - Vector(0, 0, 32);
 	Vector vecAim = BaseClass::GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );
@@ -4434,23 +4434,74 @@ void CHL2_Player::TraceKickAttack()
 		}
 	}
 
-	CBaseEntity *pEntity = tr.m_pEnt;
-	if ( pEntity != NULL )
+	if (pKickedEntity == NULL)
 	{
+		pKickedEntity = tr.m_pEnt;
+	}
+
+	if ( pKickedEntity != NULL )
+	{
+		float dmg = sk_plr_dmg_kick.GetFloat();
+		int dmgType = DMG_CLUB;
+
+		CTakeDamageInfo dmgInfo( this, this, dmg, dmgType );
+		dmgInfo.SetDamagePosition( tr.endpos );
+		VectorNormalize( vecAim );// not a unit vec yet
+		// hit like a 5kg object flying 100 ft/s
+		dmgInfo.SetDamageForce( dmg * 256 * 12 * vecAim );
+
 		// Try to dispatch an interaction
-		if ( !pEntity->DispatchInteraction( g_interactionBadCopKick, &tr, this ) )
+		KickInfo_t kickInfo( &tr, &dmgInfo );
+		if (!pKickedEntity->DispatchInteraction( g_interactionBadCopKick, &kickInfo, this ))
 		{
-			float dmg = sk_plr_dmg_kick.GetFloat();;
-			int dmgType = DMG_CLUB;
+			if (pKickedEntity->m_takedamage == DAMAGE_NO && pKickedEntity->GetParent())
+			{
+				// Send the damage to the recipient's parent instead
+				// (important for brush doors, charger trailers, etc.)
+				if (!pKickedEntity->GetParent()->DispatchInteraction( g_interactionBadCopKick, &kickInfo, this ))
+				{
+					pKickedEntity->GetParent()->DispatchTraceAttack( dmgInfo, vecAim, &tr );
+					ApplyMultiDamage();
+				}
 
-			CTakeDamageInfo dmgInfo( this, this, dmg, dmgType );
-			dmgInfo.SetDamagePosition( tr.endpos );
-			VectorNormalize( vecAim );// not a unit vec yet
-									  // hit like a 5kg object flying 100 ft/s
-			dmgInfo.SetDamageForce( dmg * 256 * 12 * vecAim );
+				// Use pEntity for the remaining stuff below
+				// (allows brush doors to count towards achievements)
+				pKickedEntity = pKickedEntity->GetParent();
+			}
+			else
+			{
+				// Send the damage to the recipient
+				pKickedEntity->DispatchTraceAttack( dmgInfo, vecAim, &tr );
+				ApplyMultiDamage();
+			}
+		}
 
-			// Send the damage to the recipient
-			pEntity->DispatchTraceAttack( dmgInfo, vecAim, &tr );
+		if (kickInfo.success)
+		{
+			// Fire achievement event
+			IGameEvent *event = gameeventmanager->CreateEvent( "entity_kicked" );
+			if (event)
+			{
+				event->SetInt( "entindex_kicked", pKickedEntity ? pKickedEntity->entindex() : 0 );
+				event->SetInt( "entindex_attacker", this->entindex() );
+				event->SetInt( "entindex_inflictor", this->entindex() );
+				event->SetInt( "damagebits", dmgInfo.GetDamageType() );
+				gameeventmanager->FireEvent( event );
+			}
+
+			// Add a context counting how many times this entity has been kicked
+			if (pKickedEntity)
+			{
+				int iIndex = pKickedEntity->FindContextByName( "kicked" );
+				int iNumKicks = 1;
+				if (iIndex != -1)
+				{
+					// Increment for each kick
+					iNumKicks += atoi( pKickedEntity->GetContextValue( iIndex ) );
+				}
+
+				pKickedEntity->AddContext( "kicked", CNumStr( iNumKicks ) );
+			}
 		}
 
 		// Insert an AI sound so nearby enemies can hear the impact
