@@ -184,7 +184,7 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 			!( contents & MASK_WATER ) ? g_sModelIndexFireball : g_sModelIndexWExplosion,
 			m_DmgRadius * .03, 
 			25,
-			TE_EXPLFLAG_NONE,
+			TE_EXPLFLAG_NOFIREBALL | TE_EXPLFLAG_NOPARTICLES,
 			m_DmgRadius,
 			m_flDamage,
 			&vecNormal,
@@ -198,7 +198,7 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 			!( contents & MASK_WATER ) ? g_sModelIndexFireball : g_sModelIndexWExplosion,
 			m_DmgRadius * .03, 
 			25,
-			TE_EXPLFLAG_NONE,
+			TE_EXPLFLAG_NOFIREBALL | TE_EXPLFLAG_NOPARTICLES,
 			m_DmgRadius,
 			m_flDamage );
 	}

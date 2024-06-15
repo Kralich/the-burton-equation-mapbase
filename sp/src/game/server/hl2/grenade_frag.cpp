@@ -8,6 +8,8 @@
 #include "cbase.h"
 #include "basegrenade_shared.h"
 #include "grenade_frag.h"
+#include "particle_parse.h"
+#include "particles/particles.h"
 #include "Sprite.h"
 #include "SpriteTrail.h"
 #include "soundent.h"
@@ -301,13 +303,15 @@ void CGrenadeFrag::VPhysicsUpdate( IPhysicsObject *pPhysics )
 
 void CGrenadeFrag::Precache( void )
 {
+	PrecacheParticleSystem( "explosion_grenade" );
+
 	PrecacheModel( GRENADE_MODEL );
 
 	PrecacheScriptSound( "Grenade.Blip" );
 
 	PrecacheModel( "sprites/redglow1.vmt" );
 	PrecacheModel( "sprites/bluelaser1.vmt" );
-
+	PrecacheParticleSystem("explosion_grenade");
 	BaseClass::Precache();
 }
 
@@ -353,6 +357,7 @@ void CGrenadeFrag::DelayThink()
 	if( gpGlobals->curtime > m_flDetonateTime )
 	{
 		Detonate();
+		DispatchParticleEffect( "explosion_grenade", GetAbsOrigin(), QAngle( 0, 0, 0 ) );
 		return;
 	}
 
