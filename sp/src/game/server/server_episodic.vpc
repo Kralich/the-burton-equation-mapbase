@@ -274,6 +274,7 @@ $Project "Server (Episodic)"
 			$File	"hl2\weapon_usp.cpp"
 			$File	"hl2\weapon_luger.cpp"
 			$File	"hl2\weapon_glock.cpp"
+			$File	"hl2\weapon_oicw.cpp"
 			$File	"episodic\ep1_gamestats.h"
 			$File	"episodic\ep2_gamestats.h"
 			$File	"episodic\ep1_gamestats.cpp" \
