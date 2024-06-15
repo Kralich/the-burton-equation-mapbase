@@ -41,6 +41,8 @@ class IEntitySaveUtils;
 class CRecipientFilter;
 class CStudioHdr;
 
+extern Vector playerMuzzleVector;
+
 // Matching the high level concept is significantly better than other criteria
 // FIXME:  Could do this in the script file by making it required and bumping up weighting there instead...
 #define CONCEPT_WEIGHT 5.0f

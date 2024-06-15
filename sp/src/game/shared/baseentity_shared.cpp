@@ -79,6 +79,8 @@ float k_flMaxEntityEulerAngle = 360.0 * 1000.0f; // really should be restricted 
 float k_flMaxEntitySpeed = k_flMaxVelocity * 2.0f;
 float k_flMaxEntitySpinRate = k_flMaxAngularVelocity * 10.0f;
 
+Vector playerMuzzleVector;
+
 ConVar	ai_shot_bias_min( "ai_shot_bias_min", "-1.0", FCVAR_REPLICATED );
 ConVar	ai_shot_bias_max( "ai_shot_bias_max", "1.0", FCVAR_REPLICATED );
 ConVar	ai_debug_shoot_positions( "ai_debug_shoot_positions", "0", FCVAR_REPLICATED | FCVAR_CHEAT );
@@ -2020,9 +2022,73 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 					Tracer.endpos = info.m_vecSrc + ( vecEnd - info.m_vecSrc ) * fPortalFraction;
 				}
 #endif //#ifdef PORTAL
+#ifdef GAME_DLL
+				//MakeTracer( vecTracerSrc, Tracer, pAmmoDef->TracerType(info.m_iAmmoType) );
+				// Particle Tracer Code
+				QAngle vecMuzzleAngles;
+				CBaseCombatCharacter *pBCC = MyCombatCharacterPointer();
+				//DevMsg("Entity: %s \n", this->GetClassname());
 
-				MakeTracer( vecTracerSrc, Tracer, pAmmoDef->TracerType(info.m_iAmmoType) );
+				if (pBCC != NULL)
+				{
+					//DevMsg("Character: %s \n", pBCC->GetDebugName());
+					VectorAngles(Vector(Tracer.startpos - Tracer.endpos), vecMuzzleAngles);
+					//vecMuzzleAngles = QAngle(vecMuzzleAngles.x * -1, vecMuzzleAngles.y * -1, vecMuzzleAngles.z * -1);
 
+					CBaseCombatWeapon* weaponActive = pBCC->GetActiveWeapon();
+					if (weaponActive != NULL) {
+						//DevMsg("Ammo Type: %i \n", weaponActive->GetPrimaryAmmoType());
+
+						CBasePlayer *pPlayer = ToBasePlayer(this);
+
+						if (pPlayer != NULL) {
+							vecTracerSrc = playerMuzzleVector;
+						}
+
+						//DispatchParticleEffect("weapon_tracer_debug", vecTracerSrc, vecTracerDest, vecMuzzleAngles);
+
+						switch (weaponActive->GetPrimaryAmmoType()) {
+						case 1:
+							DispatchParticleEffect( "weapon_tracer_pulse", vecTracerSrc, vecTracerDest, vecMuzzleAngles );
+							break;
+						case 3:
+							DispatchParticleEffect( "weapon_tracer_pistol", vecTracerSrc, vecTracerDest, vecMuzzleAngles );
+							break;
+						case 4:
+							DispatchParticleEffect( "weapon_tracer_smg", vecTracerSrc, vecTracerDest, vecMuzzleAngles );
+							break;
+						case 5:
+							DispatchParticleEffect( "weapon_tracer_357", vecTracerSrc, vecTracerDest, vecMuzzleAngles );
+							break;
+						case 28:
+							DispatchParticleEffect( "weapon_tracer_rifle", vecTracerSrc, vecTracerDest, vecMuzzleAngles );
+							break;
+						case 31:
+							DispatchParticleEffect( "weapon_tracer_rifle", vecTracerSrc, vecTracerDest, vecMuzzleAngles );
+							break;
+						case 32:
+							DispatchParticleEffect( "weapon_tracer_gr9", vecTracerSrc, vecTracerDest, vecMuzzleAngles );
+						default:
+							DispatchParticleEffect( "weapon_tracer_generic", vecTracerSrc, vecTracerDest, vecMuzzleAngles );
+							break;
+						}
+			}
+					else if (FClassnameIs( pBCC, "npc_turret_floor" ) || FClassnameIs( pBCC, "npc_turret_ceiling" ) || FClassnameIs( pBCC, "npc_turret_ground" )) {
+						DispatchParticleEffect( "weapon_tracer_pulse", vecTracerSrc, vecTracerDest, vecMuzzleAngles );
+					}
+					else if (FClassnameIs( pBCC, "npc_helicopter" ) || FClassnameIs( pBCC, "npc_combinegunship" ) || FClassnameIs( pBCC, "npc_combinedropship" ))
+						DispatchParticleEffect( "weapon_tracer_pulse_heavy", vecTracerSrc, vecTracerDest, vecMuzzleAngles );
+		}
+				else if (this != NULL) {
+					if (FClassnameIs( this, "func_tank" )) {
+						DispatchParticleEffect( "weapon_tracer_gr9", vecTracerSrc, vecTracerDest, vecMuzzleAngles );
+					}
+					else if (FClassnameIs( this, "prop_vehicle_airboat" ) || FClassnameIs( this, "func_tankairboatgun" )) {
+						DispatchParticleEffect( "weapon_tracer_pulse", vecTracerSrc, vecTracerDest, vecMuzzleAngles );
+					}
+				}
+
+#endif
 #ifdef PORTAL
 				if ( pShootThroughPortal )
 				{
@@ -2083,8 +2149,15 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 	}
 #endif
 }
+#ifdef GAME_DLL
+void MuzzleVec_CC( const CCommand &args )
+{
+	playerMuzzleVector = Vector( V_atof( args.Arg( 1 ) ), V_atof( args.Arg( 2 ) ), V_atof( args.Arg( 3 ) ) );
+	//DevMsg("Muzzle Vectors: %.2f %.2f %.2f \n", playerMuzzleVector.x, playerMuzzleVector.y, playerMuzzleVector.z);
+}
 
-
+ConCommand send_muzzle_vectors( "send_muzzle_vectors", MuzzleVec_CC, "Used by game.", FCVAR_HIDDEN );
+#endif
 //-----------------------------------------------------------------------------
 // Should we draw bubbles underwater?
 //-----------------------------------------------------------------------------

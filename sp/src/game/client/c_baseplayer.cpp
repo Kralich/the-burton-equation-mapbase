@@ -1031,6 +1031,17 @@ void C_BasePlayer::OnRestore()
 //-----------------------------------------------------------------------------
 void C_BasePlayer::OnDataChanged( DataUpdateType_t updateType )
 {
+	if (IsPlayer()) {
+		Vector MuzzlePosition;
+		C_BaseAnimating* pWeaponModel = GetRenderedWeaponModel();
+		if (pWeaponModel != NULL) {
+			GetRenderedWeaponModel()->GetAttachment( GetRenderedWeaponModel()->LookupAttachment( "muzzle" ), MuzzlePosition );
+			//MuzzlePosition = Weapon_ShootPosition();
+			engine->ServerCmd( VarArgs( "send_muzzle_vectors %.2f %.2f %.2f", MuzzlePosition.x, MuzzlePosition.y, MuzzlePosition.z ), true );
+			//DevMsg("Muzzle Vectors Client-Side: %.2f %.2f %.2f \n", MuzzlePosition.x, MuzzlePosition.y, MuzzlePosition.z);
+		}
+	}
+
 #if !defined( NO_ENTITY_PREDICTION )
 	if ( IsLocalPlayer() )
 	{
