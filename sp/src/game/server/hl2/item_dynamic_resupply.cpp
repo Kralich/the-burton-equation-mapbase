@@ -40,8 +40,7 @@ struct SpawnInfo_t
 static DynamicResupplyItems_t g_DynamicResupplyHealthItems[] =
 {
 	{ "item_healthkit", "Health",	0, 0.0f, },
-	// Unused in TBE
-	//{ "item_battery", "Armor", 0, 0.0f },
+	{ "item_battery",	"Armor",	0, 0.0f },
 };
 
 // Ammo types
@@ -60,6 +59,7 @@ static DynamicResupplyItems_t g_DynamicResupplyAmmoItems[] =
 };
 
 #define DS_HEALTH_INDEX		0
+#define DS_ARMOR_INDEX		1
 #define DS_GRENADE_INDEX	6
 
 #define NUM_HEALTH_ITEMS	(ARRAYSIZE(g_DynamicResupplyHealthItems))
@@ -142,7 +142,7 @@ BEGIN_DATADESC( CItem_DynamicResupply )
 	DEFINE_INPUTFUNC( FIELD_VOID, "BecomeMaster", InputBecomeMaster ),
 
 	DEFINE_KEYFIELD( m_flDesiredHealth[0], FIELD_FLOAT, "DesiredHealth" ),
-	//DEFINE_KEYFIELD( m_flDesiredHealth[1], FIELD_FLOAT, "DesiredArmor" ),
+	DEFINE_KEYFIELD( m_flDesiredHealth[1], FIELD_FLOAT, "DesiredArmor" ),
 	DEFINE_KEYFIELD( m_flDesiredAmmo[0], FIELD_FLOAT, "DesiredAmmoPistol" ),
 	DEFINE_KEYFIELD( m_flDesiredAmmo[1], FIELD_FLOAT, "DesiredAmmoSMG1" ),
 	DEFINE_KEYFIELD( m_flDesiredAmmo[2], FIELD_FLOAT, "DesiredAmmoSMG1_Grenade" ),
@@ -178,7 +178,7 @@ CItem_DynamicResupply::CItem_DynamicResupply( void )
 
 	// Setup default values
 	m_flDesiredHealth[0] = 1.0;	// Health
-	//m_flDesiredHealth[1] = 0.0;	// Armor
+	m_flDesiredHealth[1] = 0.3;	// Armor
 	m_flDesiredAmmo[0] = 0.5;	// Pistol
 	m_flDesiredAmmo[1] = 0.5;	// SMG1
 	m_flDesiredAmmo[2] = 0.1;	// SMG1 Grenade
@@ -464,6 +464,21 @@ void CItem_DynamicResupply::ComputeHealthRatios( CItem_DynamicResupply* pMaster,
 
 			float flCurrentHealth = pPlayer->GetHealth() + (pSpawnInfo[i].m_iPotentialItems * sk_healthkit.GetFloat());
 			pSpawnInfo[i].m_flCurrentRatio = (flCurrentHealth / flMax);
+		}
+		else if ( i == DS_ARMOR_INDEX )
+		{
+			// Armor 
+			// Ignore armor if we don't have the suit
+			if ( !pPlayer->IsSuitEquipped() )
+			{
+				pSpawnInfo[i].m_flCurrentRatio = 1.0;
+			}
+			else
+			{
+				flMax = MAX_NORMAL_BATTERY;
+				float flCurrentArmor = pPlayer->ArmorValue() + (pSpawnInfo[i].m_iPotentialItems * sk_battery.GetFloat());
+				pSpawnInfo[i].m_flCurrentRatio = (flCurrentArmor / flMax);
+			}
 		}
 
 		pSpawnInfo[i].m_flDesiredRatio = pMaster->m_flDesiredHealth[i] * sk_dynamic_resupply_modifier.GetFloat();
