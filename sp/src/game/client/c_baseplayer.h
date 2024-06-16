@@ -70,6 +70,11 @@ public:
 
 bool IsInFreezeCam( void );
 
+// Lower on the list - higher priority
+enum PlayerScreenFX {
+	SFX_OICW = 1 << 0,
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: Base Player class
 //-----------------------------------------------------------------------------
@@ -83,6 +88,10 @@ public:
 
 	C_BasePlayer();
 	virtual			~C_BasePlayer();
+
+	int m_fxSFX = 0;
+	void SetFX( int fxType, bool setting ) { setting ? m_fxSFX |= fxType : m_fxSFX &= ~fxType; };
+	bool GetFX( int fxType ) { return ((m_fxSFX & fxType) != 0); };
 
 	virtual void	Spawn( void );
 	virtual void	SharedSpawn(); // Shared between client and server.

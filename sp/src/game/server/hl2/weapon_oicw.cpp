@@ -55,11 +55,11 @@ public:
 
 	virtual const Vector& GetBulletSpread( void )
 	{
-		static Vector cone;
-
-		cone = VECTOR_CONE_3DEGREES;
-
-		return cone;
+		static Vector cone = VECTOR_CONE_3DEGREES;
+		static Vector coneScoped;
+		if (m_bIsScoped)
+			coneScoped = VECTOR_CONE_1DEGREES;
+		return m_bIsScoped ? coneScoped : cone;
 	}
 
 	const WeaponProficiencyInfo_t *GetProficiencyValues();
