@@ -322,7 +322,7 @@ void CNPC_CombineS::Event_Killed( const CTakeDamageInfo &info )
 			{
 #ifdef MAPBASE
 				CBaseEntity *pItem;
-				if (GetActiveWeapon() && FClassnameIs(GetActiveWeapon(), "weapon_smg1"))
+				if (GetActiveWeapon() && (FClassnameIs(GetActiveWeapon(), "weapon_smg1") || FClassnameIs(GetActiveWeapon(), "weapon_oicw")))
 					pItem = DropItem( "item_ammo_smg1_grenade", WorldSpaceCenter()+RandomVector(-4,4), RandomAngle(0,360) );
 				else
 					pItem = DropItem( "item_ammo_ar2_altfire", WorldSpaceCenter()+RandomVector(-4,4), RandomAngle(0,360) );
