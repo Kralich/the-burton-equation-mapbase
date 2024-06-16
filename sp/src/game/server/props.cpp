@@ -42,6 +42,8 @@
 #include "gamestats.h"
 #include "vehicle_base.h"
 #include "hl2_player.h"
+#include "particles/particles.h"
+#include "particle_parse.h"
 #ifdef MAPBASE
 #include "mapbase/GlobalStrings.h"
 #include "collisionutils.h"
@@ -1929,19 +1931,21 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 
 	if ( m_explodeDamage > 0 || m_explodeRadius > 0 )
 	{
-		if( HasInteraction( PROPINTER_PHYSGUN_BREAK_EXPLODE ) )
+		if (HasInteraction( PROPINTER_PHYSGUN_BREAK_EXPLODE ))
 		{
-			ExplosionCreate( WorldSpaceCenter(), angles, pAttacker, m_explodeDamage, m_explodeRadius, 
-				SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE | SF_ENVEXPLOSION_SURFACEONLY | SF_ENVEXPLOSION_NOSOUND,
+			ExplosionCreate( WorldSpaceCenter(), angles, pAttacker, m_explodeDamage, m_explodeRadius,
+				SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NOPARTICLES | SF_ENVEXPLOSION_NOFIREBALL | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE | SF_ENVEXPLOSION_SURFACEONLY | SF_ENVEXPLOSION_NOSOUND,
 				0.0f, this );
-			EmitSound("PropaneTank.Burst");
+			DispatchParticleEffect( "explosion_gas", GetAbsOrigin(), GetAbsAngles() );
+			EmitSound( "PropaneTank.Burst" );
 		}
 		else
 		{
 			float flScale = GetModelScale();
 			ExplosionCreate( WorldSpaceCenter(), angles, pAttacker, m_explodeDamage * flScale, m_explodeRadius * flScale,
-				SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE | SF_ENVEXPLOSION_SURFACEONLY,
+				SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NOPARTICLES | SF_ENVEXPLOSION_NOFIREBALL | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE | SF_ENVEXPLOSION_SURFACEONLY,
 				0.0f, this );
+			DispatchParticleEffect( "explosion_barrel", GetAbsOrigin(), GetAbsAngles() );
 		}
 
 		bExploded = true;
