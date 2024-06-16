@@ -6,9 +6,9 @@
 #include "view_shared.h"
 #include "c_weapon__stubs.h"
 
-class C_WeaponOICW : public C_HLMachineGun
+class C_WeaponOICW : public C_HLSelectFireMachineGun
 {
-	DECLARE_CLASS( C_WeaponOICW, C_HLMachineGun );
+	DECLARE_CLASS( C_WeaponOICW, C_HLSelectFireMachineGun );
 
 public:
 	DECLARE_CLIENTCLASS();

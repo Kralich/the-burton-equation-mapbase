@@ -16,10 +16,10 @@ extern ConVar    sk_plr_dmg_smg1_grenade;
 //-----------------------------------------------------------------------------
 // OICW
 //-----------------------------------------------------------------------------
-class CWeaponOICW : public CHLMachineGun
+class CWeaponOICW : public CHLSelectFireMachineGun
 {
 public:
-	DECLARE_CLASS( CWeaponOICW, CHLMachineGun );
+	DECLARE_CLASS( CWeaponOICW, CHLSelectFireMachineGun );
 	DECLARE_SERVERCLASS();
 
 	CWeaponOICW();
