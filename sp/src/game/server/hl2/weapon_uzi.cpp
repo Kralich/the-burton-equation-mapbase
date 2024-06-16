@@ -21,7 +21,14 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern ConVar    sk_plr_dmg_smg1_grenade;	
+#define MIN_SPREAD_COMPONENT weapon_uzi_min_spread.GetFloat()
+#define MAX_SPREAD_COMPONENT weapon_uzi_max_spread.GetFloat()
+
+ConVar weapon_uzi_altfire_ammo_modifier( "weapon_uzi_altfire_ammo_modifier", "1", FCVAR_NONE, "Multiply the number of bullets per shot by this amount for altfire" );
+ConVar weapon_uzi_altfire_spread_divisor( "weapon_uzi_altfire_spread_divisor", "3", FCVAR_NONE, "How much to divide the spread component for altfire (higher numbers = better sustained accuracy)" );
+ConVar weapon_uzi_altfire_rate( "weapon_uzi_altfire_rate", "0.06", FCVAR_NONE, "weapon_uzi's full-auto fire rate." );
+ConVar weapon_uzi_burst_cycle_rate( "weapon_uzi_burst_cycle_rate", "0.2", FCVAR_NONE, "uzi maximum fire cone vector component" );
+ConVar weapon_uzi_debug( "weapon_uzi_debug", "0", FCVAR_NONE, "Log messages to console about the uzi spread" );
 
 ConVar	sk_plr_dmg_uzi	( "sk_plr_dmg_uzi", "0", FCVAR_REPLICATED );
 ConVar	sk_npc_dmg_uzi		( "sk_npc_dmg_uzi", "0", FCVAR_REPLICATED );
@@ -37,12 +44,11 @@ public:
 
 	DECLARE_SERVERCLASS();
 	
-	void	Precache( void );
 	void	AddViewKick( void );
 	void	SecondaryAttack( void );
 
-	int		GetMinBurst() { return 2; }
-	int		GetMaxBurst() { return 5; }
+	int		GetMinBurst() { return 3; }
+	int		GetMaxBurst() { return 3; }
 
 	virtual void Equip( CBaseCombatCharacter *pOwner );
 	bool	Reload( void );
@@ -54,7 +60,15 @@ public:
 
 	virtual const Vector& GetBulletSpread( void )
 	{
-		static const Vector cone = VECTOR_CONE_5DEGREES;
+		static Vector cone;
+		if (m_iBurstSize > 0)
+		{
+			cone = VECTOR_CONE_3DEGREES;
+		}
+		else
+		{
+			cone = VECTOR_CONE_5DEGREES;
+		}
 		return cone;
 	}
 
@@ -68,12 +82,25 @@ public:
 	virtual float GetDamageOverride();
 	virtual float GetPlayerDamageOverride();
 
+	// Burst-fire
+	Vector CalculateBurstAttackSpread();
+	void	BurstAttack( int burstSize, float cycleRate, int spentAmmoModifier = 1 );
+
+	void	ItemPostFrame( void );
+
+	float	GetBurstCycleRate( void ) { return weapon_uzi_burst_cycle_rate.GetFloat(); };
+	int		GetBurstSize( void ) { return 3; };
+
+	float	GetBurstFireRate( void ) { return weapon_uzi_altfire_rate.GetFloat(); }
+
 	DECLARE_ACTTABLE();
 
 protected:
 
 	Vector	m_vecTossVelocity;
 	float	m_flNextGrenadeCheck;
+	float	m_flLastPrimaryAttack;
+	float   m_flSpreadComponent;
 };
 
 IMPLEMENT_SERVERCLASS_ST(CWeaponUZI, DT_WeaponUZI)
@@ -86,6 +113,8 @@ BEGIN_DATADESC( CWeaponUZI )
 
 	DEFINE_FIELD( m_vecTossVelocity, FIELD_VECTOR ),
 	DEFINE_FIELD( m_flNextGrenadeCheck, FIELD_TIME ),
+	DEFINE_FIELD( m_flSpreadComponent, FIELD_FLOAT ),
+	DEFINE_FIELD( m_flLastPrimaryAttack, FIELD_TIME ),
 
 END_DATADESC()
 
@@ -148,18 +177,11 @@ CWeaponUZI::CWeaponUZI( )
 {
 	m_fMinRange1		= 0;// No minimum range. 
 	m_fMaxRange1		= 1400;
+	m_iBurstSize = 0;
+	m_iSecondaryAmmoType = -1;
+	m_iClip2 = -1;
 
 	m_bAltFiresUnderwater = false;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CWeaponUZI::Precache( void )
-{
-	UTIL_PrecacheOther("grenade_ar2");
-
-	BaseClass::Precache();
 }
 
 //-----------------------------------------------------------------------------
@@ -342,70 +364,8 @@ void CWeaponUZI::AddViewKick( void )
 //-----------------------------------------------------------------------------
 void CWeaponUZI::SecondaryAttack( void )
 {
-	// Only the player fires this way so we can cast
-	CBasePlayer *pPlayer = ToBasePlayer( GetOwner() );
-	
-	if ( pPlayer == NULL )
-		return;
-
-	//Must have ammo
-	if ( ( pPlayer->GetAmmoCount( m_iSecondaryAmmoType ) <= 0 ) || ( pPlayer->GetWaterLevel() == 3 ) )
-	{
-		SendWeaponAnim( ACT_VM_DRYFIRE );
-		BaseClass::WeaponSound( EMPTY );
-		m_flNextSecondaryAttack = gpGlobals->curtime + 0.5f;
-		return;
-	}
-
-	if( m_bInReload )
-		m_bInReload = false;
-
-	// MUST call sound before removing a round from the clip of a CMachineGun
-	BaseClass::WeaponSound( WPN_DOUBLE );
-
-	pPlayer->RumbleEffect( RUMBLE_357, 0, RUMBLE_FLAGS_NONE );
-
-	Vector vecSrc = pPlayer->Weapon_ShootPosition();
-	Vector	vecThrow;
-	// Don't autoaim on grenade tosses
-	AngleVectors( pPlayer->EyeAngles() + pPlayer->GetPunchAngle(), &vecThrow );
-	VectorScale( vecThrow, 1000.0f, vecThrow );
-	
-	//Create the grenade
-	QAngle angles;
-	VectorAngles( vecThrow, angles );
-	CGrenadeAR2 *pGrenade = (CGrenadeAR2*)Create( "grenade_ar2", vecSrc, angles, pPlayer );
-	pGrenade->SetAbsVelocity( vecThrow );
-
-	pGrenade->SetLocalAngularVelocity( RandomAngle( -400, 400 ) );
-	pGrenade->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE ); 
-	pGrenade->SetThrower( GetOwner() );
-	pGrenade->SetDamage( sk_plr_dmg_smg1_grenade.GetFloat() );
-
-	SendWeaponAnim( ACT_VM_SECONDARYATTACK );
-
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 1000, 0.2, GetOwner(), SOUNDENT_CHANNEL_WEAPON );
-
-	// player "shoot" animation
-	pPlayer->SetAnimation( PLAYER_ATTACK1 );
-
-	// Decrease ammo
-	pPlayer->RemoveAmmo( 1, m_iSecondaryAmmoType );
-
-	// Can shoot again immediately
-	m_flNextPrimaryAttack = gpGlobals->curtime + 0.5f;
-
-	// Can blow up after a short delay (so have time to release mouse button)
-	m_flNextSecondaryAttack = gpGlobals->curtime + 1.0f;
-
-	// Register a muzzleflash for the AI.
-	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 0.5 );	
-
-	m_iSecondaryAttacks++;
-	gamestats->Event_WeaponFired( pPlayer, false, GetClassname() );
+	BurstAttack( GetBurstSize(), GetBurstCycleRate(), 1 );
 }
-
-#define	COMBINE_MIN_GRENADE_CLEAR_DIST 256
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -465,7 +425,8 @@ int CWeaponUZI::WeaponRangeAttack2Condition( float flDot, float flDist )
 	// estimate position
 	// vecTarget = vecTarget + pEnemy->m_vecVelocity * 2;
 
-
+	// marked for deletion
+	/*
 	if ( ( vecTarget - npcOwner->GetLocalOrigin() ).Length2D() <= COMBINE_MIN_GRENADE_CLEAR_DIST )
 	{
 		// crap, I don't want to blow myself up
@@ -487,7 +448,7 @@ int CWeaponUZI::WeaponRangeAttack2Condition( float flDot, float flDist )
 			m_flNextGrenadeCheck = gpGlobals->curtime + 1; // one full second.
 			return (COND_WEAPON_BLOCKED_BY_FRIEND);
 		}
-	}
+	}*/
 
 	// ---------------------------------------------------------------------
 	// Check that throw is legal and clear
@@ -510,6 +471,205 @@ int CWeaponUZI::WeaponRangeAttack2Condition( float flDot, float flDist )
 		// don't check again for a while.
 		m_flNextGrenadeCheck = gpGlobals->curtime + 1; // one full second.
 		return COND_WEAPON_SIGHT_OCCLUDED;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CWeaponUZI::BurstAttack( int burstSize, float cycleRate, int spentAmmoModifier )
+{
+	// Bursts always use the weapon's fire rate
+	float fireRate = GetFireRate();
+
+	if (m_bFireOnEmpty)
+	{
+		return;
+	}
+
+	if (!GetOwner())
+	{
+		Msg( "Error: UZI has NULL owner!" );
+		return;
+	}
+
+	// Only the player fires this way so we can cast
+	CBasePlayer * pPlayer = ToBasePlayer( GetOwner() );
+	if (!pPlayer)
+		return;
+
+	m_nShotsFired++;
+
+	// Send the animation early to properly handle recoil animation
+	SendWeaponAnim( GetPrimaryAttackActivity() );
+
+	pPlayer->DoMuzzleFlash();
+
+	// To make the firing framerate independent, we may have to fire more than one bullet here on low-framerate systems, 
+	// especially if the weapon we're firing has a really fast rate of fire.
+	int iBulletsToFire = 0;
+
+	// If the last time fired was longer ago than the cycle rate, reset the burst count
+	if (gpGlobals->curtime - m_flLastPrimaryAttack >= cycleRate)
+	{
+		m_iBurstSize = 0;
+	}
+
+	// MUST call sound before removing a round from the clip of a CHLMachineGun
+	while (m_flNextPrimaryAttack <= gpGlobals->curtime)
+	{
+		WeaponSound( SINGLE, m_flNextPrimaryAttack );
+
+		// Add the bullets to fire to the burst count
+		m_iBurstSize++;
+
+		// If the burst count is greater than the burst size, wait for the cycle rate and adjust
+		if (m_iBurstSize >= burstSize) {
+			m_iBurstSize = 0;
+			m_nShotsFired = burstSize > 1 ? 0 : m_nShotsFired; // Reset the shots fired counter so the correct activity plays
+			m_flNextPrimaryAttack = m_flNextPrimaryAttack + cycleRate;
+			m_flNextSecondaryAttack = m_flNextPrimaryAttack + cycleRate; // UZI shares primary attack between primary and secondary
+		}
+		else {
+			m_flNextPrimaryAttack = m_flNextPrimaryAttack + fireRate;
+			m_flNextSecondaryAttack = m_flNextPrimaryAttack + fireRate; // UZI shares primary attack between primary and secondary
+		}
+
+		iBulletsToFire++;
+	}
+
+	// Make sure we don't fire more than the amount in the clip, if this weapon uses clips
+	if (UsesClipsForAmmo1())
+	{
+		if (iBulletsToFire > m_iClip1)
+			iBulletsToFire = m_iClip1;
+		m_iClip1 -= MIN( iBulletsToFire * spentAmmoModifier, m_iClip1 );
+	}
+
+	m_iPrimaryAttacks++;
+	gamestats->Event_WeaponFired( pPlayer, true, GetClassname() );
+
+	// Fire the bullets
+	FireBulletsInfo_t info;
+	info.m_iShots = iBulletsToFire;
+	info.m_vecSrc = pPlayer->Weapon_ShootPosition();
+	info.m_vecDirShooting = pPlayer->GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );
+	info.m_vecSpread = GetOwner()->GetAttackSpread( this );
+	info.m_flDistance = MAX_TRACE_LENGTH;
+	info.m_iAmmoType = m_iPrimaryAmmoType;
+	info.m_iTracerFreq = 1;
+	FireBullets( info );
+
+	// Update last attack time - need to do this after calculating weapon spread
+	m_flLastPrimaryAttack = gpGlobals->curtime;
+
+	//Factor in the view kick
+	AddViewKick();
+
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SOUNDENT_VOLUME_MACHINEGUN, 0.2, pPlayer );
+
+	if (!m_iClip1 && pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) <= 0)
+	{
+		// HEV suit - indicate out of ammo condition
+		pPlayer->SetSuitUpdate( "!HEV_AMO0", FALSE, 0 );
+	}
+
+	pPlayer->SetAnimation( PLAYER_ATTACK1 );
+
+	// Register a muzzleflash for the AI
+	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 0.5 );
+	SetWeaponIdleTime( gpGlobals->curtime + 3.0f );
+
+	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
+	if (pOwner)
+	{
+		m_iPrimaryAttacks++;
+		gamestats->Event_WeaponFired( pOwner, true, GetClassname() );
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: UZI overrides ItemPostFrame because the primary and secondary
+// fire modes are the same but with slightly different parameters.
+//-----------------------------------------------------------------------------
+void CWeaponUZI::ItemPostFrame( void )
+{
+	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
+	if (!pOwner)
+		return;
+
+	UpdateAutoFire();
+
+	//Track the duration of the fire
+	//FIXME: Check for IN_ATTACK2 as well?
+	//FIXME: What if we're calling ItemBusyFrame?
+	m_fFireDuration = (pOwner->m_nButtons & IN_ATTACK) || (pOwner->m_nButtons & IN_ATTACK2) ? (m_fFireDuration + gpGlobals->frametime) : 0.0f;
+	CheckReload();
+
+
+	if (((pOwner->m_nButtons & IN_ATTACK) || (pOwner->m_nButtons & IN_ATTACK2)) && (m_flNextPrimaryAttack <= gpGlobals->curtime))
+	{
+		// Clip empty? Or out of ammo on a no-clip weapon?
+		if ((UsesClipsForAmmo1() && m_iClip1 <= 0) || (!UsesClipsForAmmo1() && pOwner->GetAmmoCount( m_iPrimaryAmmoType ) <= 0))
+		{
+			HandleFireOnEmpty();
+		}
+		else if (pOwner->GetWaterLevel() == 3 && m_bFiresUnderwater == false)
+		{
+			// This weapon doesn't fire underwater
+			WeaponSound( EMPTY );
+			m_flNextPrimaryAttack = gpGlobals->curtime + 0.2;
+			return;
+		}
+		else
+		{
+			//NOTENOTE: There is a bug with this code with regards to the way machine guns catch the leading edge trigger
+			//			on the player hitting the attack key.  It relies on the gun catching that case in the same frame.
+			//			However, because the player can also be doing a secondary attack, the edge trigger may be missed.
+			//			We really need to hold onto the edge trigger and only clear the condition when the gun has fired its
+			//			first shot.  Right now that's too much of an architecture change -- jdw
+
+			// If the firing button was just pressed, or the alt-fire just released, reset the firing time
+			//if ((pOwner->m_afButtonPressed & IN_ATTACK) || (pOwner->m_afButtonReleased & IN_ATTACK2))
+			{
+				m_flNextPrimaryAttack = gpGlobals->curtime;
+			}
+			if ((pOwner->m_nButtons & IN_ATTACK))
+			{
+				PrimaryAttack();
+			}
+			else {
+				SecondaryAttack();
+			}
+		}
+	}
+
+	// -----------------------
+	//  Reload pressed / Clip Empty
+	// -----------------------
+	if ((pOwner->m_nButtons & IN_RELOAD) && UsesClipsForAmmo1() && !m_bInReload)
+	{
+		// reload when reload is pressed, or if no buttons are down and weapon is empty.
+		Reload();
+		m_fFireDuration = 0.0f;
+	}
+
+	// -----------------------
+	//  No buttons down
+	// -----------------------
+	if (!((pOwner->m_nButtons & IN_ATTACK) || (pOwner->m_nButtons & IN_ATTACK2) || (CanReload() && pOwner->m_nButtons & IN_RELOAD)))
+	{
+		// no fire buttons down or reloading
+		if (!ReloadOrSwitchWeapons() && (m_bInReload == false))
+		{
+			WeaponIdle();
+		}
+	}
+
+	// Debounce the recoiling counter
+	if ((pOwner->m_nButtons & IN_ATTACK) == false && (pOwner->m_nButtons & IN_ATTACK2) == false)
+	{
+		m_nShotsFired = 0;
 	}
 }
 
