@@ -25,7 +25,8 @@ public:
 	
 	DECLARE_SERVERCLASS();
 
-	void	PrimaryAttack( void );
+	virtual void	PrimaryAttack( void );
+	virtual void	PrimaryAttack( WeaponSound_t weaponSound );
 
 	// Default calls through to m_hOwner, but plasma weapons can override and shoot projectiles here.
 	virtual void	ItemPostFrame( void );
@@ -83,8 +84,10 @@ public:
 	virtual int		GetBurstSize( void ) { return 3; };
 
 	void			BurstThink( void );
+	void			BurstSingleSoundThink( void );
 
 	virtual void	PrimaryAttack( void );
+	virtual void	PrimaryAttack( WeaponSound_t weaponSound );
 	virtual void	SecondaryAttack( void );
 
 	virtual int		WeaponRangeAttack1Condition( float flDot, float flDist );

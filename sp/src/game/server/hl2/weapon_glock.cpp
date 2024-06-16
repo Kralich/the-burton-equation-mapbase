@@ -31,17 +31,20 @@ ConVar	glock_use_new_accuracy( "glock_use_new_accuracy", "1" );
 
 ConVar	sk_plr_dmg_glock		( "sk_plr_dmg_glock", "0", FCVAR_REPLICATED );
 ConVar	sk_npc_dmg_glock		( "sk_npc_dmg_glock", "0", FCVAR_REPLICATED );
+ConVar  sk_glock_burst_time( "sk_glock_burst_time", "0.25", 0 );
+ConVar  sk_glock_burst_size( "sk_glock_burst_size", "3", 0 );
+ConVar  sk_glock_burst_speed( "sk_glock_burst_speed", "3", 0 );
 
 //-----------------------------------------------------------------------------
 // CWeaponGLOCK
 //-----------------------------------------------------------------------------
 
-class CWeaponGLOCK : public CBaseHLCombatWeapon
+class CWeaponGLOCK : public CHLSelectFireMachineGun
 {
 	DECLARE_DATADESC();
 
 public:
-	DECLARE_CLASS( CWeaponGLOCK, CBaseHLCombatWeapon );
+	DECLARE_CLASS( CWeaponGLOCK, CHLSelectFireMachineGun );
 
 	CWeaponGLOCK(void);
 
@@ -52,7 +55,10 @@ public:
 	void	ItemPreFrame( void );
 	void	ItemBusyFrame( void );
 	void	PrimaryAttack( void );
+	void	SecondaryAttack( void );
 	void	AddViewKick( void );
+	virtual float	GetBurstCycleRate( void ) { return sk_glock_burst_time.GetFloat(); };
+	virtual int GetBurstSize( void ) { return sk_glock_burst_size.GetInt(); };
 	void	DryFire( void );
 	void	Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
 
@@ -71,22 +77,27 @@ public:
 			return npcCone;
 			
 		static Vector cone;
-
-		if (glock_use_new_accuracy.GetBool() )
+		if (m_iBurstSize < 0)
 		{
-			float ramp = RemapValClamped(	m_flAccuracyPenalty, 
-											0.0f, 
-											PISTOL_ACCURACY_MAXIMUM_PENALTY_TIME, 
-											0.0f, 
-											1.0f ); 
+			if (glock_use_new_accuracy.GetBool())
+			{
+				float ramp = RemapValClamped( m_flAccuracyPenalty,
+					0.0f,
+					PISTOL_ACCURACY_MAXIMUM_PENALTY_TIME,
+					0.0f,
+					1.0f );
 
-			// We lerp from very accurate to inaccurate over time
-			VectorLerp( VECTOR_CONE_1DEGREES, VECTOR_CONE_6DEGREES, ramp, cone );
+				// We lerp from very accurate to inaccurate over time
+				VectorLerp( VECTOR_CONE_1DEGREES, VECTOR_CONE_6DEGREES, ramp, cone );
+			}
+			else
+			{
+				// Old value
+				cone = VECTOR_CONE_4DEGREES;
+			}
 		}
-		else
-		{
-			// Old value
-			cone = VECTOR_CONE_4DEGREES;
+		else {
+			cone = VECTOR_CONE_7DEGREES;
 		}
 
 		return cone;
@@ -263,6 +274,34 @@ void CWeaponGLOCK::PrimaryAttack( void )
 
 	m_iPrimaryAttacks++;
 	gamestats->Event_WeaponFired( pOwner, true, GetClassname() );
+}
+
+void CWeaponGLOCK::SecondaryAttack() {
+	// suppress weird m1+m2 stuff
+	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
+	if (pOwner)
+	{
+		if (pOwner->m_nButtons & IN_ATTACK) {
+			return;
+		}
+	}
+	if (Clip1() == 1)
+	{
+		// no point doing the double burst when we can't even fire 2 bullets
+		PrimaryAttack();
+		return;
+	}
+
+	m_iBurstSize = GetBurstSize();
+
+	// Call the think function directly so that the first round gets fired immediately.
+	BurstSingleSoundThink();
+	SetThink( &CHLSelectFireMachineGun::BurstSingleSoundThink );
+	m_flNextPrimaryAttack = gpGlobals->curtime + GetBurstCycleRate();
+	m_flNextSecondaryAttack = gpGlobals->curtime + GetBurstCycleRate();
+
+	// Pick up the rest of the burst through the think function.
+	SetNextThink( gpGlobals->curtime + GetFireRate() / sk_glock_burst_speed.GetFloat() );
 }
 
 //-----------------------------------------------------------------------------

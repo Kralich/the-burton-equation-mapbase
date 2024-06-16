@@ -20,6 +20,7 @@
 #include "tier0/memdbgon.h"
 
 #define GRENADE_TIMER	3.0f //Seconds
+#define GRENADE_BLIP_TIMER 1.0f // seconds
 
 #define GRENADE_PAUSED_NO			0
 #define GRENADE_PAUSED_PRIMARY		1
@@ -45,12 +46,13 @@ public:
 	void	SecondaryAttack( void );
 	void	DecrementAmmo( CBaseCombatCharacter *pOwner );
 	void	ItemPostFrame( void );
+	float	GetElapsedCookTime( void ) { return gpGlobals->curtime - m_flDrawbackTime; }
 
 	bool	Deploy( void );
 	bool	Holster( CBaseCombatWeapon *pSwitchingTo = NULL );
 
 	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
-	
+
 	bool	Reload( void );
 
 	bool	ShouldDisplayHUDHint() { return true; }
@@ -66,6 +68,8 @@ private:
 	
 	int		m_AttackPaused;
 	bool	m_fDrawbackFinished;
+	float	m_flDrawbackTime;
+	float	m_fNextBlip;
 
 	DECLARE_ACTTABLE();
 
@@ -77,6 +81,8 @@ BEGIN_DATADESC( CWeaponFrag )
 	DEFINE_FIELD( m_bRedraw, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_AttackPaused, FIELD_INTEGER ),
 	DEFINE_FIELD( m_fDrawbackFinished, FIELD_BOOLEAN ),
+	DEFINE_FIELD( m_flDrawbackTime, FIELD_FLOAT ),
+	DEFINE_FIELD( m_fNextBlip, FIELD_FLOAT ),
 END_DATADESC()
 
 acttable_t	CWeaponFrag::m_acttable[] = 
@@ -125,6 +131,7 @@ void CWeaponFrag::Precache( void )
 
 	UTIL_PrecacheOther( "npc_grenade_frag" );
 
+	PrecacheScriptSound( "Grenade.Blip" );
 	PrecacheScriptSound( "WeaponFrag.Throw" );
 	PrecacheScriptSound( "WeaponFrag.Roll" );
 }
@@ -166,6 +173,9 @@ void CWeaponFrag::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChar
 	{
 		case EVENT_WEAPON_SEQUENCE_FINISHED:
 			m_fDrawbackFinished = true;
+			m_flDrawbackTime = gpGlobals->curtime;
+			EmitSound( "Grenade.Blip" );
+			m_fNextBlip = m_flDrawbackTime + GRENADE_BLIP_TIMER;
 			break;
 
 		case EVENT_WEAPON_THROW:
@@ -248,6 +258,10 @@ bool CWeaponFrag::Reload( void )
 //-----------------------------------------------------------------------------
 void CWeaponFrag::SecondaryAttack( void )
 {
+	// no changing your mind!!!
+	if (m_fDrawbackFinished) 
+		return;
+
 	if ( m_bRedraw )
 		return;
 
@@ -284,6 +298,10 @@ void CWeaponFrag::SecondaryAttack( void )
 //-----------------------------------------------------------------------------
 void CWeaponFrag::PrimaryAttack( void )
 {
+	// no changing your mind!!!
+	if (m_fDrawbackFinished)
+		return;
+
 	if ( m_bRedraw )
 		return;
 
@@ -331,6 +349,21 @@ void CWeaponFrag::ItemPostFrame( void )
 {
 	if( m_fDrawbackFinished )
 	{
+		// blip with same blip timer system as a thrown grenade, i.e. start slow, go fast
+		if (GetElapsedCookTime() <= GRENADE_TIMER)
+		{
+			if (gpGlobals->curtime >= m_fNextBlip)
+			{
+				EmitSound( "Grenade.Blip" );
+				if (GetElapsedCookTime() > FRAG_GRENADE_WARN_TIME){
+					m_fNextBlip += FRAG_GRENADE_BLIP_FAST_FREQUENCY;
+				}
+				else{
+					m_fNextBlip += FRAG_GRENADE_BLIP_FREQUENCY;
+				}
+			}
+		}
+
 		CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
 
 		if (pOwner)
@@ -413,7 +446,7 @@ void CWeaponFrag::ThrowGrenade( CBasePlayer *pPlayer )
 	Vector vecThrow;
 	pPlayer->GetVelocity( &vecThrow, NULL );
 	vecThrow += vForward * 1200;
-	Fraggrenade_Create( vecSrc, vec3_angle, vecThrow, AngularImpulse(600,random->RandomInt(-1200,1200),0), pPlayer, GRENADE_TIMER, false );
+	Fraggrenade_Create( vecSrc, vec3_angle, vecThrow, AngularImpulse( 600, random->RandomInt( -1200, 1200 ), 0 ), pPlayer, GRENADE_TIMER - GetElapsedCookTime(), false, m_flDrawbackTime );
 
 	m_bRedraw = true;
 
@@ -443,7 +476,7 @@ void CWeaponFrag::LobGrenade( CBasePlayer *pPlayer )
 	Vector vecThrow;
 	pPlayer->GetVelocity( &vecThrow, NULL );
 	vecThrow += vForward * 350 + Vector( 0, 0, 50 );
-	Fraggrenade_Create( vecSrc, vec3_angle, vecThrow, AngularImpulse(200,random->RandomInt(-600,600),0), pPlayer, GRENADE_TIMER, false );
+	Fraggrenade_Create( vecSrc, vec3_angle, vecThrow, AngularImpulse( 200, random->RandomInt( -600, 600 ), 0 ), pPlayer, GRENADE_TIMER - GetElapsedCookTime(), false, m_flDrawbackTime );
 
 	WeaponSound( WPN_DOUBLE );
 
@@ -491,7 +524,7 @@ void CWeaponFrag::RollGrenade( CBasePlayer *pPlayer )
 	QAngle orientation(0,pPlayer->GetLocalAngles().y,-90);
 	// roll it
 	AngularImpulse rotSpeed(0,0,720);
-	Fraggrenade_Create( vecSrc, orientation, vecThrow, rotSpeed, pPlayer, GRENADE_TIMER, false );
+	Fraggrenade_Create( vecSrc, orientation, vecThrow, rotSpeed, pPlayer, GRENADE_TIMER - GetElapsedCookTime(), false, m_flDrawbackTime );
 
 	WeaponSound( SPECIAL1 );
 
