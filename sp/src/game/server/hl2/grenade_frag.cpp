@@ -54,6 +54,7 @@ public:
 	void	SetVelocity( const Vector &velocity, const AngularImpulse &angVelocity );
 	int		OnTakeDamage( const CTakeDamageInfo &inputInfo );
 	void	BlipSound() { EmitSound( "Grenade.Blip" ); }
+	void	SetBlipTime( float nextTime ) { m_flNextBlipTime = nextTime; }
 	void	DelayThink();
 	void	VPhysicsUpdate( IPhysicsObject *pPhysics );
 	void	OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
@@ -447,12 +448,36 @@ void CGrenadeFrag::InputSetTimer( inputdata_t &inputdata )
 	SetTimer( inputdata.value.Float(), inputdata.value.Float() - FRAG_GRENADE_WARN_TIME );
 }
 
-CBaseGrenade *Fraggrenade_Create( const Vector &position, const QAngle &angles, const Vector &velocity, const AngularImpulse &angVelocity, CBaseEntity *pOwner, float timer, bool combineSpawned )
+CBaseGrenade *Fraggrenade_Create( const Vector &position, const QAngle &angles, const Vector &velocity, const AngularImpulse &angVelocity, CBaseEntity *pOwner, float timer, bool combineSpawned, float startTime )
 {
 	// Don't set the owner here, or the player can't interact with grenades he's thrown
 	CGrenadeFrag *pGrenade = (CGrenadeFrag *)CBaseEntity::Create( "npc_grenade_frag", position, angles, pOwner );
 	
-	pGrenade->SetTimer( timer, timer - FRAG_GRENADE_WARN_TIME );
+	if (startTime != -1){
+		// cooked grenade
+		float elapsedTime = gpGlobals->curtime - startTime;
+		bool isWarned = elapsedTime > FRAG_GRENADE_WARN_TIME;
+		if (!isWarned){
+			pGrenade->SetTimer( timer, timer - FRAG_GRENADE_WARN_TIME );
+		}
+		else {
+			pGrenade->SetTimer( timer, 0 ); // warn enemy AI immediately
+		}
+
+		// find the most optimal next blip time to keep blipping consistent with cooking
+		if (elapsedTime < ceil( FRAG_GRENADE_WARN_TIME )){
+			pGrenade->SetBlipTime( startTime + ceil( elapsedTime ) ); // slow blips
+		}
+		else {
+			float blipTime = ceil( FRAG_GRENADE_WARN_TIME );
+			while (startTime + blipTime <= gpGlobals->curtime) { blipTime += FRAG_GRENADE_BLIP_FAST_FREQUENCY; }	// fast blips; no upper limit on timer since the grenade will detonate anyway
+			pGrenade->SetBlipTime( startTime + blipTime );
+		}
+	}
+	else {
+		// uncooked grenade
+		pGrenade->SetTimer( timer, timer - FRAG_GRENADE_WARN_TIME );
+	}
 	pGrenade->SetVelocity( velocity, angVelocity );
 	pGrenade->SetThrower( ToBaseCombatCharacter( pOwner ) );
 	pGrenade->m_takedamage = DAMAGE_EVENTS_ONLY;
