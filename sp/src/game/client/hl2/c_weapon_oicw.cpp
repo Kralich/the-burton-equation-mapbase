@@ -21,24 +21,21 @@ public:
 	void DisableScope();
 
 	bool m_bIsScoped;
-
-	bool m_bIsPlayer;
 };
 
 STUB_WEAPON_CLASS_IMPLEMENT( weapon_oicw, C_WeaponOICW );
 
 IMPLEMENT_CLIENTCLASS_DT( C_WeaponOICW, DT_WeaponOICW, CWeaponOICW )
 RecvPropBool( RECVINFO( m_bIsScoped ) ),
-RecvPropBool( RECVINFO( m_bIsPlayer ) ),
 END_RECV_TABLE()
 
 void C_WeaponOICW::OnDataChanged( DataUpdateType_t updateType )
 {
 	BaseClass::OnDataChanged( updateType );
-	if (m_bIsScoped && m_bIsPlayer) {
+	if (m_bIsScoped && GetOwner()->IsPlayer()) {
 		EnableScope();
 	}
-	else if (!m_bIsScoped && m_bIsPlayer) {
+	else if (!m_bIsScoped && GetOwner()->IsPlayer()) {
 		DisableScope();
 	}
 }

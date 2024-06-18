@@ -265,6 +265,7 @@ $Project "Server (HL2)"
 				$File	"hl2\weapon_flaregun.h"
 			}
 			
+			$File "$SRCDIR\game\shared\tbe\weapon_parse_tbe.cpp"
 		}
 	}
 }

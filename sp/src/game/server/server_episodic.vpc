@@ -312,6 +312,7 @@ $Project "Server (Episodic)"
 		{
 				$File "$SRCDIR\game\shared\tbe\tbe_powerup.cpp"
 				$File "$SRCDIR\game\shared\tbe\tbe_powerup.h"
+				$File "$SRCDIR\game\shared\tbe\weapon_parse_tbe.cpp"
 		}
 		
 

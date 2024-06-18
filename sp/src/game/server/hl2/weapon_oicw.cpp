@@ -380,6 +380,9 @@ void CWeaponOICW::SecondaryAttack( void )
 	// player "shoot" animation
 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
 
+	// Decrease ammo
+	pPlayer->RemoveAmmo( 1, m_iSecondaryAmmoType );
+
 	// Can shoot again immediately
 	m_flNextPrimaryAttack = gpGlobals->curtime + 0.5f;
 
