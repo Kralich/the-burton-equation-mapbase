@@ -47,6 +47,7 @@ public:
 
 	int CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 
+	static Vector m_vecBulletSpread;
 	virtual const Vector& GetBulletSpread( void )
 	{
 		static Vector vitalAllyCone = VECTOR_CONE_3DEGREES;
@@ -70,6 +71,7 @@ public:
 
 	virtual float			GetFireRate( void );
 
+	virtual void Equip( CBaseCombatCharacter *pOwner );
 	bool StartReload( void );
 	bool Reload( void );
 	void FillClip( void );
@@ -362,7 +364,18 @@ float CWeaponShotgun::GetFireRate()
 		return 0.8f;
 	}
 
-	return GetTBEWpnData().m_flFireRate;
+	return 0.7f;
+}
+
+Vector CWeaponShotgun::m_vecBulletSpread;
+
+void CWeaponShotgun::Equip( CBaseCombatCharacter *pOwner )
+{
+	// init accuracy and cache it, to avoid doing unnecessary trig
+	float flCone = sinf( GetTBEWpnData().m_flAccuracy * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
+	m_vecBulletSpread = Vector( flCone, flCone, flCone );
+
+	BaseClass::Equip( pOwner );
 }
 
 //-----------------------------------------------------------------------------

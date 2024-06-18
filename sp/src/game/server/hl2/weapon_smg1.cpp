@@ -51,6 +51,13 @@ public:
 	int		WeaponRangeAttack2Condition( float flDot, float flDist );
 	Activity	GetPrimaryAttackActivity( void );
 
+	static Vector m_vecBulletSpread;
+	virtual const Vector& GetBulletSpread( void )
+	{
+		static const Vector cone = m_vecBulletSpread;
+		return cone;
+	}
+
 	const WeaponProficiencyInfo_t *GetProficiencyValues();
 
 	void FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, Vector &vecShootOrigin, Vector &vecShootDir );
@@ -194,6 +201,8 @@ void CWeaponSMG1::Precache( void )
 	BaseClass::Precache();
 }
 
+Vector CWeaponSMG1::m_vecBulletSpread;
+
 //-----------------------------------------------------------------------------
 // Purpose: Give this weapon longer range when wielded by an ally NPC.
 //-----------------------------------------------------------------------------
@@ -207,6 +216,10 @@ void CWeaponSMG1::Equip( CBaseCombatCharacter *pOwner )
 	{
 		m_fMaxRange1 = 1400;
 	}
+
+	// init accuracy and cache it, to avoid doing unnecessary trig
+	float flCone = sinf( GetTBEWpnData().m_flAccuracy * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
+	m_vecBulletSpread = Vector( flCone, flCone, flCone );
 
 	BaseClass::Equip( pOwner );
 }

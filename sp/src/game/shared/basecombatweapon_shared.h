@@ -355,7 +355,6 @@ public:
 	virtual void			WeaponSound( WeaponSound_t sound_type, float soundtime = 0.0f );
 	virtual void			StopWeaponSound( WeaponSound_t sound_type );
 	virtual const WeaponProficiencyInfo_t *GetProficiencyValues();
-	static Vector			m_vecBulletSpread;
 
 	// Autoaim
 	virtual float			GetMaxAutoAimDeflection() { return 0.99f; }

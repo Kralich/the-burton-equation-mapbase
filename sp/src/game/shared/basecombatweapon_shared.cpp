@@ -1295,10 +1295,6 @@ void CBaseCombatWeapon::Equip( CBaseCombatCharacter *pOwner )
 		m_flNextSecondaryAttack = gpGlobals->curtime;
 		SetModel( GetWorldModel() );
 	}
-
-	// init accuracy and cache it, to avoid doing unnecessary trig
-	float flCone = sinf( GetTBEWpnData().m_flAccuracy * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
-	m_vecBulletSpread = Vector( flCone, flCone, flCone );
 }
 
 void CBaseCombatWeapon::SetActivity( Activity act, float duration ) 
@@ -2279,8 +2275,6 @@ int CBaseCombatWeapon::GetBulletType( void )
 	return 0;
 }
 
-Vector CBaseCombatWeapon::m_vecBulletSpread;
-
 //-----------------------------------------------------------------------------
 // Purpose: Base class default for getting spread
 // Input  :
@@ -2288,7 +2282,7 @@ Vector CBaseCombatWeapon::m_vecBulletSpread;
 //-----------------------------------------------------------------------------
 const Vector& CBaseCombatWeapon::GetBulletSpread( void )
 {
-	static Vector cone = m_vecBulletSpread;
+	static Vector cone = VECTOR_CONE_15DEGREES;
 	return cone;
 }
 

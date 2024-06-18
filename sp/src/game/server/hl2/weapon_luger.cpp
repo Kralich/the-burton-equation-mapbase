@@ -60,8 +60,10 @@ public:
 	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 	Activity	GetPrimaryAttackActivity( void );
 
+	virtual void Equip( CBaseCombatCharacter *pOwner );
 	virtual bool Reload( void );
 
+	static Vector m_vecBulletSpread;
 	virtual const Vector& GetBulletSpread( void )
 	{		
 		// Handle NPCs first
@@ -326,6 +328,17 @@ void CWeaponLUGER::ItemPostFrame( void )
 	{
 		DryFire();
 	}
+}
+
+Vector CWeaponLUGER::m_vecBulletSpread;
+
+void CWeaponLUGER::Equip( CBaseCombatCharacter *pOwner )
+{
+	// init accuracy and cache it, to avoid doing unnecessary trig
+	float flCone = sinf( GetTBEWpnData().m_flAccuracy * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
+	m_vecBulletSpread = Vector( flCone, flCone, flCone );
+
+	BaseClass::Equip( pOwner );
 }
 
 //-----------------------------------------------------------------------------

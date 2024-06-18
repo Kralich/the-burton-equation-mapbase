@@ -70,6 +70,7 @@ public:
 	virtual void Equip( CBaseCombatCharacter *pOwner );
 	virtual bool Reload( void );
 
+	static Vector m_vecBulletSpread;
 	static Vector m_vecBulletSpreadAlt;
 	virtual const Vector& GetBulletSpread( void )
 	{		
@@ -370,13 +371,17 @@ void CWeaponGLOCK::ItemPostFrame( void )
 	}
 }
 
+Vector CWeaponGLOCK::m_vecBulletSpread;
 Vector CWeaponGLOCK::m_vecBulletSpreadAlt;
 
 void CWeaponGLOCK::Equip( CBaseCombatCharacter *pOwner )
 {
 	// init accuracy and cache it, to avoid doing unnecessary trig
-	float flCone = sinf( GetTBEWpnData().m_flAccuracyAlt * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
-	m_vecBulletSpreadAlt = Vector( flCone, flCone, flCone );
+	float flCone = sinf( GetTBEWpnData().m_flAccuracy * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
+	m_vecBulletSpread = Vector( flCone, flCone, flCone );
+
+	float flConeAlt = sinf( GetTBEWpnData().m_flAccuracyAlt * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
+	m_vecBulletSpreadAlt = Vector( flConeAlt, flConeAlt, flConeAlt );
 
 	BaseClass::Equip( pOwner );
 }
