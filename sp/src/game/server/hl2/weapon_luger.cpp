@@ -80,12 +80,12 @@ public:
 											1.0f ); 
 
 			// We lerp from very accurate to inaccurate over time
-			VectorLerp( VECTOR_CONE_1DEGREES, VECTOR_CONE_6DEGREES, ramp, cone );
+			VectorLerp( m_vecBulletSpread, m_vecBulletSpread * 6, ramp, cone );
 		}
 		else
 		{
 			// Old value
-			cone = VECTOR_CONE_4DEGREES;
+			cone = m_vecBulletSpread * 4;
 		}
 
 		return cone;
@@ -103,7 +103,7 @@ public:
 
 	virtual float GetFireRate( void ) 
 	{
-		return 0.5f; 
+		return GetTBEWpnData().m_flFireRate;
 	}
 	
 	// Added by 1upD - damage override methods for when you need damage to not be the ammo type's damage

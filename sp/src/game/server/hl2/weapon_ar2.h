@@ -43,7 +43,7 @@ public:
 
 	int		GetMinBurst( void ) { return 2; }
 	int		GetMaxBurst( void ) { return 5; }
-	float	GetFireRate( void ) { return 0.1f; }
+	float	GetFireRate( void ) { return GetTBEWpnData().m_flFireRate; }
 
 	bool	CanHolster( void );
 	bool	Reload( void );
@@ -58,7 +58,7 @@ public:
 	{
 		static Vector cone;
 		
-		cone = VECTOR_CONE_3DEGREES;
+		cone = m_vecBulletSpread;
 
 		return cone;
 	}

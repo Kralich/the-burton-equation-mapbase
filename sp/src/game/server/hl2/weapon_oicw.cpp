@@ -29,6 +29,7 @@ public:
 
 	void			SecondaryAttack( void );
 	bool			Holster( CBaseCombatWeapon * pSwitchingTo );
+	virtual void	Equip( CBaseCombatCharacter *pOwner );
 	virtual bool	Reload();
 
 	const char		*GetTracerType( void ) { return "AR2Tracer"; }
@@ -45,7 +46,7 @@ public:
 
 	int		GetMinBurst( void ) { return 2; }
 	int		GetMaxBurst( void ) { return 5; }
-	float	GetFireRate( void ) { return 0.1f; } // todo: change when i do the firerate thing
+	float	GetFireRate( void );
 
 	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 
@@ -53,12 +54,13 @@ public:
 
 	void	DoImpactEffect( trace_t &tr, int nDamageType );
 
+	static Vector m_vecBulletSpreadAlt;
 	virtual const Vector& GetBulletSpread( void )
 	{
-		static Vector cone = VECTOR_CONE_3DEGREES;
+		static Vector cone = m_vecBulletSpread;
 		static Vector coneScoped;
 		if (m_bIsScoped)
-			coneScoped = VECTOR_CONE_1DEGREES;
+			coneScoped = m_vecBulletSpreadAlt;
 		return m_bIsScoped ? coneScoped : cone;
 	}
 
@@ -275,6 +277,17 @@ void CWeaponOICW::ItemPostFrame( void )
 
 }
 
+Vector CWeaponOICW::m_vecBulletSpreadAlt;
+
+void CWeaponOICW::Equip( CBaseCombatCharacter *pOwner )
+{
+	// init accuracy and cache it, to avoid doing unnecessary trig
+	float flCone = sinf( GetTBEWpnData().m_flAccuracyAlt * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
+	m_vecBulletSpreadAlt = Vector( flCone, flCone, flCone );
+
+	BaseClass::Equip( pOwner );
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Output : Activity
@@ -323,6 +336,21 @@ bool CWeaponOICW::Holster( CBaseCombatWeapon *pSwitchingTo )
 	}
 
 	return BaseClass::Holster( pSwitchingTo );
+}
+
+float CWeaponOICW::GetFireRate()
+{
+	if (!GetOwner()->IsNPC()) {
+		if (m_bIsScoped) {
+			return GetTBEWpnData().m_flFireRateScoped;
+		}
+		else {
+			return GetTBEWpnData().m_flFireRate;
+		}
+	}
+	else {
+		return GetTBEWpnData().m_flFireRate;
+	}
 }
 
 //-----------------------------------------------------------------------------

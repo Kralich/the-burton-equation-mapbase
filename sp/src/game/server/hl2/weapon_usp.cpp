@@ -67,8 +67,10 @@ public:
 	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 	Activity	GetPrimaryAttackActivity( void );
 
+	virtual void Equip( CBaseCombatCharacter *pOwner );
 	virtual bool Reload( void );
 
+	static Vector m_vecBulletSpreadAlt;
 	virtual const Vector& GetBulletSpread( void )
 	{		
 		// Handle NPCs first
@@ -88,16 +90,16 @@ public:
 					1.0f );
 
 				// We lerp from very accurate to inaccurate over time
-				VectorLerp( VECTOR_CONE_1DEGREES, VECTOR_CONE_6DEGREES, ramp, cone );
+				VectorLerp( m_vecBulletSpread, m_vecBulletSpread * 6, ramp, cone );
 			}
 			else
 			{
 				// Old value
-				cone = VECTOR_CONE_4DEGREES;
+				cone = m_vecBulletSpread * 4;
 			}
 		}
 		else {
-			cone = VECTOR_CONE_7DEGREES;
+			cone = m_vecBulletSpreadAlt;
 		}
 
 		return cone;
@@ -115,7 +117,7 @@ public:
 
 	virtual float GetFireRate( void ) 
 	{
-		return 0.5f; 
+		return GetTBEWpnData().m_flFireRate;
 	}
 
 	// Added by 1upD - damage override methods for when you need damage to not be the ammo type's damage
@@ -366,6 +368,17 @@ void CWeaponUSP::ItemPostFrame( void )
 	{
 		DryFire();
 	}
+}
+
+Vector CWeaponUSP::m_vecBulletSpreadAlt;
+
+void CWeaponUSP::Equip( CBaseCombatCharacter *pOwner )
+{
+	// init accuracy and cache it, to avoid doing unnecessary trig
+	float flCone = sinf( GetTBEWpnData().m_flAccuracyAlt * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
+	m_vecBulletSpreadAlt = Vector( flCone, flCone, flCone );
+
+	BaseClass::Equip( pOwner );
 }
 
 //-----------------------------------------------------------------------------

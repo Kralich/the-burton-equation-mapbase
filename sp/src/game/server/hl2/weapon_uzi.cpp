@@ -53,22 +53,21 @@ public:
 	virtual void Equip( CBaseCombatCharacter *pOwner );
 	bool	Reload( void );
 
-	float	GetFireRate( void ) { return 0.075f; }	// 13.3hz
+	float	GetFireRate( void ) { return GetTBEWpnData().m_flFireRate; }
 	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 	int		WeaponRangeAttack2Condition( float flDot, float flDist );
 	Activity	GetPrimaryAttackActivity( void );
 
+	static Vector m_vecBulletSpreadAlt;
 	virtual const Vector& GetBulletSpread( void )
 	{
 		static Vector cone;
-		if (m_iBurstSize > 0)
-		{
-			cone = VECTOR_CONE_3DEGREES;
-		}
+
+		if (m_bPrimary)
+			cone = m_vecBulletSpread;
 		else
-		{
-			cone = VECTOR_CONE_5DEGREES;
-		}
+			cone = m_vecBulletSpreadAlt;
+
 		return cone;
 	}
 
@@ -101,6 +100,7 @@ protected:
 	float	m_flNextGrenadeCheck;
 	float	m_flLastPrimaryAttack;
 	float   m_flSpreadComponent;
+	bool	m_bPrimary;
 };
 
 IMPLEMENT_SERVERCLASS_ST(CWeaponUZI, DT_WeaponUZI)
@@ -115,6 +115,7 @@ BEGIN_DATADESC( CWeaponUZI )
 	DEFINE_FIELD( m_flNextGrenadeCheck, FIELD_TIME ),
 	DEFINE_FIELD( m_flSpreadComponent, FIELD_FLOAT ),
 	DEFINE_FIELD( m_flLastPrimaryAttack, FIELD_TIME ),
+	DEFINE_FIELD(m_bPrimary, FIELD_BOOLEAN),
 
 END_DATADESC()
 
@@ -172,6 +173,8 @@ acttable_t	CWeaponUZI::m_acttable[] =
 
 IMPLEMENT_ACTTABLE(CWeaponUZI);
 
+Vector CWeaponUZI::m_vecBulletSpreadAlt;
+
 //=========================================================
 CWeaponUZI::CWeaponUZI( )
 {
@@ -197,6 +200,10 @@ void CWeaponUZI::Equip( CBaseCombatCharacter *pOwner )
 	{
 		m_fMaxRange1 = 1400;
 	}
+
+	// init accuracy and cache it, to avoid doing unnecessary trig
+	float flCone = sinf( GetTBEWpnData().m_flAccuracyAlt * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
+	m_vecBulletSpreadAlt = Vector( flCone, flCone, flCone );
 
 	BaseClass::Equip( pOwner );
 }
@@ -590,9 +597,11 @@ void CWeaponUZI::ItemPostFrame( void )
 			}
 			if ((pOwner->m_nButtons & IN_ATTACK))
 			{
+				m_bPrimary = true;
 				PrimaryAttack();
 			}
 			else {
+				m_bPrimary = false;
 				SecondaryAttack();
 			}
 		}
@@ -623,7 +632,7 @@ void CWeaponUZI::ItemPostFrame( void )
 	// Debounce the recoiling counter
 	if ((pOwner->m_nButtons & IN_ATTACK) == false && (pOwner->m_nButtons & IN_ATTACK2) == false)
 	{
-		m_nShotsFired = 0;
+		m_iBurstSize = 0;
 	}
 }
 

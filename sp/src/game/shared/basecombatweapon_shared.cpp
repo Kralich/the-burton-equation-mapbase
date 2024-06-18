@@ -392,6 +392,11 @@ const FileWeaponInfo_t &CBaseCombatWeapon::GetWpnData( void ) const
 	return *GetFileWeaponInfoFromHandle( m_hWeaponFileInfo );
 }
 
+const CTBEWeaponInfo &CBaseCombatWeapon::GetTBEWpnData( void ) const
+{
+	return *static_cast< CTBEWeaponInfo* >(GetFileWeaponInfoFromHandle( m_hWeaponFileInfo ));
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -1290,6 +1295,10 @@ void CBaseCombatWeapon::Equip( CBaseCombatCharacter *pOwner )
 		m_flNextSecondaryAttack = gpGlobals->curtime;
 		SetModel( GetWorldModel() );
 	}
+
+	// init accuracy and cache it, to avoid doing unnecessary trig
+	float flCone = sinf( GetTBEWpnData().m_flAccuracy * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
+	m_vecBulletSpread = Vector( flCone, flCone, flCone );
 }
 
 void CBaseCombatWeapon::SetActivity( Activity act, float duration ) 
@@ -2270,6 +2279,8 @@ int CBaseCombatWeapon::GetBulletType( void )
 	return 0;
 }
 
+Vector CBaseCombatWeapon::m_vecBulletSpread;
+
 //-----------------------------------------------------------------------------
 // Purpose: Base class default for getting spread
 // Input  :
@@ -2277,7 +2288,7 @@ int CBaseCombatWeapon::GetBulletType( void )
 //-----------------------------------------------------------------------------
 const Vector& CBaseCombatWeapon::GetBulletSpread( void )
 {
-	static Vector cone = VECTOR_CONE_15DEGREES;
+	static Vector cone = m_vecBulletSpread;
 	return cone;
 }
 

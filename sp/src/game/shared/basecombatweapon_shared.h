@@ -15,6 +15,7 @@
 #include "predictable_entity.h"
 #include "soundflags.h"
 #include "weapon_parse.h"
+#include "tbe/weapon_parse_tbe.h"
 #include "baseviewmodel_shared.h"
 #include "weapon_proficiency.h"
 #include "utlmap.h"
@@ -354,6 +355,7 @@ public:
 	virtual void			WeaponSound( WeaponSound_t sound_type, float soundtime = 0.0f );
 	virtual void			StopWeaponSound( WeaponSound_t sound_type );
 	virtual const WeaponProficiencyInfo_t *GetProficiencyValues();
+	static Vector			m_vecBulletSpread;
 
 	// Autoaim
 	virtual float			GetMaxAutoAimDeflection() { return 0.99f; }
@@ -399,6 +401,7 @@ public:
 
 	// Weapon info accessors for data in the weapon's data file
 	const FileWeaponInfo_t	&GetWpnData( void ) const;
+	const CTBEWeaponInfo	&GetTBEWpnData( void ) const;
 	virtual const char		*GetViewModel( int viewmodelindex = 0 ) const;
 	virtual const char		*GetWorldModel( void ) const;
 	virtual const char		*GetAnimPrefix( void ) const;
