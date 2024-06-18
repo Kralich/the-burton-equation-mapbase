@@ -80,7 +80,7 @@ public:
 			return npcCone;
 			
 		static Vector cone;
-		if (m_iBurstSize < 0)
+		if (m_iBurstSize == 0)
 		{
 			if (pistol_use_new_accuracy.GetBool())
 			{
@@ -118,7 +118,10 @@ public:
 
 	virtual float GetFireRate( void ) 
 	{
-		return GetTBEWpnData().m_flFireRate;
+		if (m_iBurstSize == 0)
+			return GetTBEWpnData().m_flFireRate;
+		else
+			return GetTBEWpnData().m_flFireRate / sk_usp_burst_speed.GetFloat();
 	}
 
 	// Added by 1upD - damage override methods for when you need damage to not be the ammo type's damage
@@ -304,7 +307,7 @@ void CWeaponUSP::SecondaryAttack() {
 	m_flNextSecondaryAttack = gpGlobals->curtime + GetBurstCycleRate();
 
 	// Pick up the rest of the burst through the think function.
-	SetNextThink( gpGlobals->curtime + GetFireRate() / sk_usp_burst_speed.GetFloat() );
+	SetNextThink( gpGlobals->curtime + GetFireRate() );
 }
 
 //-----------------------------------------------------------------------------

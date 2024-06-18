@@ -27,8 +27,8 @@
 ConVar weapon_uzi_altfire_ammo_modifier( "weapon_uzi_altfire_ammo_modifier", "1", FCVAR_NONE, "Multiply the number of bullets per shot by this amount for altfire" );
 ConVar weapon_uzi_altfire_spread_divisor( "weapon_uzi_altfire_spread_divisor", "3", FCVAR_NONE, "How much to divide the spread component for altfire (higher numbers = better sustained accuracy)" );
 ConVar weapon_uzi_altfire_rate( "weapon_uzi_altfire_rate", "0.06", FCVAR_NONE, "weapon_uzi's full-auto fire rate." );
-ConVar weapon_uzi_burst_cycle_rate( "weapon_uzi_burst_cycle_rate", "0.2", FCVAR_NONE, "uzi maximum fire cone vector component" );
-ConVar weapon_uzi_debug( "weapon_uzi_debug", "0", FCVAR_NONE, "Log messages to console about the uzi spread" );
+ConVar weapon_uzi_burst_cycle_rate( "weapon_uzi_burst_cycle_rate", "0.2", FCVAR_NONE, "Uzi maximum fire cone vector component" );
+ConVar weapon_uzi_debug( "weapon_uzi_debug", "0", FCVAR_NONE, "Log messages to console about the Uzi spread" );
 
 ConVar	sk_plr_dmg_uzi	( "sk_plr_dmg_uzi", "0", FCVAR_REPLICATED );
 ConVar	sk_npc_dmg_uzi		( "sk_npc_dmg_uzi", "0", FCVAR_REPLICATED );

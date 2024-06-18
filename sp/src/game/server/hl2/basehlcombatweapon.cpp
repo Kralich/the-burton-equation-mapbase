@@ -136,11 +136,23 @@ void CHLMachineGun::PrimaryAttack( WeaponSound_t weaponSound )
 	float fireRate = GetFireRate();
 
 	// MUST call sound before removing a round from the clip of a CHLMachineGun
-	while (m_flNextPrimaryAttack <= gpGlobals->curtime)
+	if (gpGlobals->frametime >= fireRate)
 	{
-		WeaponSound( weaponSound, m_flNextPrimaryAttack );
-		m_flNextPrimaryAttack = m_flNextPrimaryAttack + fireRate;
-		iBulletsToFire++;
+		while (m_flNextPrimaryAttack <= gpGlobals->curtime)
+		{
+			WeaponSound( weaponSound, m_flNextPrimaryAttack );
+			m_flNextPrimaryAttack = m_flNextPrimaryAttack + fireRate;
+			iBulletsToFire++;
+		}
+	}
+	else
+	{
+		// There's a bug with the pistol that causes the firing sound to not play when you hold left-click for about 10 bullets.
+		// I'm not sure exactly why it's happening, only that it is, and the framerate compensation code is responsible for it.
+		// This code fixes that issue.
+		WeaponSound( weaponSound, gpGlobals->curtime );
+		m_flNextPrimaryAttack += fireRate;
+		iBulletsToFire = 1;
 	}
 	// Make sure we don't fire more than the amount in the clip, if this weapon uses clips
 	if (UsesClipsForAmmo1())
