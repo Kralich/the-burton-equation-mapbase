@@ -4345,7 +4345,7 @@ void CHL2_Player::HandleKickAttack()
 		return;
 
 	// Door kick!
-	if ( gpGlobals->curtime >= m_flNextAttack && gpGlobals->curtime >= m_flNextKickAttack && !IsInAVehicle() && m_nButtons & IN_ATTACK3 )
+	if ( gpGlobals->curtime >= m_flNextAttack && gpGlobals->curtime >= m_flNextKickAttack && !IsInAVehicle() && m_nButtons & IN_ALT1 )
 	{
 		// Viewpunch
 		QAngle punchAng;
