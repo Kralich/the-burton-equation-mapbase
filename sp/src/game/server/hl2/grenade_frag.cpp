@@ -20,12 +20,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define FRAG_GRENADE_BLIP_FREQUENCY			1.0f
-#define FRAG_GRENADE_BLIP_FAST_FREQUENCY	0.3f
-
-#define FRAG_GRENADE_GRACE_TIME_AFTER_PICKUP 1.5f
-#define FRAG_GRENADE_WARN_TIME 1.5f
-
 const float GRENADE_COEFFICIENT_OF_RESTITUTION = 0.2f;
 
 ConVar sk_plr_dmg_fraggrenade	( "sk_plr_dmg_fraggrenade","0");
@@ -74,7 +68,7 @@ protected:
 	CHandle<CSprite>		m_pMainGlow;
 	CHandle<CSpriteTrail>	m_pGlowTrail;
 
-	float	m_flNextBlipTime;
+	float	m_flNextBlipTime = -1;
 	bool	m_inSolid;
 	bool	m_combineSpawned;
 	bool	m_punted;
@@ -148,7 +142,7 @@ void CGrenadeFrag::Spawn( void )
 	}
 
 	// Do the blip if m_flNextBlipTime wasn't changed
-	if (m_flNextBlipTime <= gpGlobals->curtime)
+	if (m_flNextBlipTime <= gpGlobals->curtime && m_flNextBlipTime != -1)
 	{
 		BlipSound();
 		m_flNextBlipTime = gpGlobals->curtime + FRAG_GRENADE_BLIP_FREQUENCY;
@@ -312,7 +306,7 @@ void CGrenadeFrag::Precache( void )
 
 	PrecacheModel( "sprites/redglow1.vmt" );
 	PrecacheModel( "sprites/bluelaser1.vmt" );
-	PrecacheParticleSystem("explosion_grenade");
+
 	BaseClass::Precache();
 }
 
@@ -372,7 +366,9 @@ void CGrenadeFrag::DelayThink()
 	
 	if( gpGlobals->curtime > m_flNextBlipTime )
 	{
-		BlipSound();
+		if (gpGlobals->curtime <= m_flDetonateTime - (FRAG_GRENADE_BLIP_FAST_FREQUENCY - 0.1f)){
+			BlipSound(); // for normal frags (3.0 second timer), this stops an occasional 4th fast blip where there should only be three (and idk why that happens)
+		}
 		
 		if( m_bHasWarnedAI )
 		{
