@@ -92,6 +92,7 @@ public:
 	int m_fxSFX = 0;
 	void SetFX( int fxType, bool setting ) { setting ? m_fxSFX |= fxType : m_fxSFX &= ~fxType; };
 	bool GetFX( int fxType ) { return ((m_fxSFX & fxType) != 0); };
+	bool m_bHasWeaponFX = false;
 
 	virtual void	Spawn( void );
 	virtual void	SharedSpawn(); // Shared between client and server.

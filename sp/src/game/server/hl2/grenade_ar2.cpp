@@ -16,6 +16,7 @@
 #include "vstdlib/random.h"
 #include "engine/IEngineSound.h"
 #include "world.h"
+#include "particle_parse.h"
 
 #ifdef PORTAL
 	#include "portal_util_shared.h"
@@ -221,9 +222,11 @@ void CGrenadeAR2::Detonate(void)
 		g_sModelIndexFireball,
 		2.0, 
 		15,
-		TE_EXPLFLAG_NONE,
+		TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOFIREBALL | TE_EXPLFLAG_NOFIREBALLSMOKE,
 		m_DmgRadius,
 		m_flDamage );
+
+	DispatchParticleEffect( "explosion_grenade", GetAbsOrigin(), QAngle( 0, 0, 0 ) );
 
 	Vector vecForward = GetAbsVelocity();
 	VectorNormalize(vecForward);
@@ -254,6 +257,7 @@ void CGrenadeAR2::Detonate(void)
 
 void CGrenadeAR2::Precache( void )
 {
+	PrecacheParticleSystem( "explosion_grenade" );
 	PrecacheModel("models/Weapons/ar2_grenade.mdl"); 
 }
 

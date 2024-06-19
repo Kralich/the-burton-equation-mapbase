@@ -76,6 +76,7 @@ private:
 };
 
 BEGIN_DATADESC(CWeaponOICW)
+	DEFINE_FIELD( m_bIsScoped, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_flScopeTime, FIELD_TIME ),
 END_DATADESC()
 
@@ -578,14 +579,25 @@ void CWeaponOICW::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChar
 //-----------------------------------------------------------------------------
 void CWeaponOICW::AddViewKick( void )
 {
-#define	EASY_DAMPEN			0.5f
-#define	MAX_VERTICAL_KICK	8.0f	//Degrees
-#define	SLIDE_LIMIT			5.0f	//Seconds
+	float	EASY_DAMPEN;
+	float	MAX_VERTICAL_KICK;
+	float	SLIDE_LIMIT;
+
+	if (m_bIsScoped) {
+		EASY_DAMPEN = 0.5f;
+		MAX_VERTICAL_KICK = 0.1f;	//Degrees
+		SLIDE_LIMIT = 0.2f;	//Seconds
+	}
+	else {
+		EASY_DAMPEN = 0.5f;
+		MAX_VERTICAL_KICK = 1.0f;	//Degrees
+		SLIDE_LIMIT = 2.0f;	//Seconds
+	}
 
 	//Get the view kick
 	CBasePlayer *pPlayer = ToBasePlayer( GetOwner() );
 
-	if (!pPlayer)
+	if (pPlayer == NULL)
 		return;
 
 	float flDuration = m_fFireDuration;

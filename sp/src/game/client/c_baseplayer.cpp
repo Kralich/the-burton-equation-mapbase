@@ -1084,7 +1084,7 @@ void C_BasePlayer::OnDataChanged( DataUpdateType_t updateType )
 			FogControllerChanged( updateType == DATA_UPDATE_CREATED );
 		}
 
-		if (view->GetScreenOverlayMaterial() == NULL)
+		if (m_fxSFX != 0 && view->GetScreenOverlayMaterial() == NULL && !m_bHasWeaponFX)
 		{
 			if (GetFX( SFX_OICW )) {
 				IMaterial* pMaterial = materials->FindMaterial( "effects/weapons/oicw_scope", TEXTURE_GROUP_CLIENT_EFFECTS, false );
@@ -1092,10 +1092,13 @@ void C_BasePlayer::OnDataChanged( DataUpdateType_t updateType )
 				{
 					view->SetScreenOverlayMaterial( pMaterial );
 				}
+				m_bHasWeaponFX = true;
 			}
-			else {
-				view->SetScreenOverlayMaterial( NULL );
-			}
+		}
+		else if (m_fxSFX == 0 && view->GetScreenOverlayMaterial() != NULL && m_bHasWeaponFX)
+		{
+			view->SetScreenOverlayMaterial( NULL );
+			m_bHasWeaponFX = false;
 		}
 	}
 }
