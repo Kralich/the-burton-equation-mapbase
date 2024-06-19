@@ -1084,15 +1084,18 @@ void C_BasePlayer::OnDataChanged( DataUpdateType_t updateType )
 			FogControllerChanged( updateType == DATA_UPDATE_CREATED );
 		}
 
-		if (GetFX( SFX_OICW )) {
-			IMaterial* pMaterial = materials->FindMaterial( "effects/weapons/oicw_scope", TEXTURE_GROUP_CLIENT_EFFECTS, false );
-			if (!IsErrorMaterial( pMaterial ))
-			{
-				view->SetScreenOverlayMaterial( pMaterial );
+		if (view->GetScreenOverlayMaterial() == NULL)
+		{
+			if (GetFX( SFX_OICW )) {
+				IMaterial* pMaterial = materials->FindMaterial( "effects/weapons/oicw_scope", TEXTURE_GROUP_CLIENT_EFFECTS, false );
+				if (!IsErrorMaterial( pMaterial ))
+				{
+					view->SetScreenOverlayMaterial( pMaterial );
+				}
 			}
-		}
-		else {
-			view->SetScreenOverlayMaterial( NULL );
+			else {
+				view->SetScreenOverlayMaterial( NULL );
+			}
 		}
 	}
 }

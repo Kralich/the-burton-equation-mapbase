@@ -446,7 +446,7 @@ int CWeaponUZI::WeaponRangeAttack2Condition( float flDot, float flDist )
 void CWeaponUZI::BurstAttack( int burstSize, float cycleRate, int spentAmmoModifier )
 {
 	// Bursts always use the weapon's fire rate
-	float fireRate = GetFireRate();
+	float fireRate = GetBurstFireRate();
 
 	if (m_bFireOnEmpty)
 	{
