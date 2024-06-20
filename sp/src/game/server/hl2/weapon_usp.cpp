@@ -411,6 +411,17 @@ Activity CWeaponUSP::GetPrimaryAttackActivity( void )
 //-----------------------------------------------------------------------------
 bool CWeaponUSP::Reload( void )
 {
+	// stop any existing bursts
+	if (m_iBurstSize > 0)
+	{
+		// The burst is over!
+		SetThink( NULL );
+		// idle immediately to stop the firing animation
+		SetWeaponIdleTime( gpGlobals->curtime );
+		// Force set the burst size so we can use primary fire again
+		m_iBurstSize = 0;
+	}
+
 	bool fRet = DefaultReload( GetMaxClip1(), GetMaxClip2(), ACT_VM_RELOAD );
 	if ( fRet )
 	{
