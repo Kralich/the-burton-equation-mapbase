@@ -32,11 +32,14 @@ END_RECV_TABLE()
 void C_WeaponOICW::OnDataChanged( DataUpdateType_t updateType )
 {
 	BaseClass::OnDataChanged( updateType );
-	if (m_bIsScoped && GetOwner()->IsPlayer()) {
-		EnableScope();
-	}
-	else if (!m_bIsScoped && GetOwner()->IsPlayer()) {
-		DisableScope();
+	if (GetOwner())
+	{
+		if (m_bIsScoped && GetOwner()->IsPlayer()) {
+			EnableScope();
+		}
+		else if (!m_bIsScoped && GetOwner()->IsPlayer()) {
+			DisableScope();
+		}
 	}
 }
 
