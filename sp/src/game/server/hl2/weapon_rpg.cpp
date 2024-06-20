@@ -2528,3 +2528,18 @@ END_SEND_TABLE()
 // Stinger variant of the RPG for the Burton Equation
 LINK_ENTITY_TO_CLASS(weapon_stinger, CWeaponStinger);
 PRECACHE_WEAPON_REGISTER(weapon_stinger);
+
+//-----------------------------------------------------------------------------
+// AT4 RPG Variant
+//-----------------------------------------------------------------------------
+class CWeaponAT4 : public CWeaponRPG {
+	DECLARE_CLASS( CWeaponAT4, CWeaponRPG );
+	DECLARE_SERVERCLASS();
+};
+
+IMPLEMENT_SERVERCLASS_ST( CWeaponAT4, DT_WeaponAT4 )
+END_SEND_TABLE()
+
+// AT4 variant of the RPG for the Burton Equation
+LINK_ENTITY_TO_CLASS( weapon_at4, CWeaponAT4 );
+PRECACHE_WEAPON_REGISTER( weapon_at4 );
