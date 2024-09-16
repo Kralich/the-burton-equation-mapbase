@@ -5,10 +5,12 @@ class CPowerup : public CBaseAnimating
 public:
 	void Spawn();
 	void RemoveEffect();
+	void PlaySound();
 	CBasePlayer* pPlayer;
 
 	int iEffect;
 	float flPowerupDuration;
+	float m_flEndTime;
 	bool cantouch = true;
 
 	COutputEvent onPickup;

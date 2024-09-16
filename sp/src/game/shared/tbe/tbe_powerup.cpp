@@ -17,6 +17,8 @@ DEFINE_OUTPUT(onPickup, "OnPickup"),
 DEFINE_ENTITYFUNC(OnTouchPowerup),
 DEFINE_KEYFIELD(iEffect, FIELD_INTEGER, "effect"),
 DEFINE_KEYFIELD(flPowerupDuration, FIELD_FLOAT, "Duration"),
+
+DEFINE_FIELD(m_flEndTime, FIELD_FLOAT),
 #endif
 
 
@@ -40,7 +42,7 @@ void CPowerup::Spawn()
 	PrecacheScriptSound("SuitRecharge.Start");
 	PrecacheScriptSound("AlyxEMP.Charge");
 	PrecacheScriptSound("WallHealth.Start");
-
+	PrecacheScriptSound( "ItemBattery.Touch" );
 
 	switch (iEffect)
 	{
@@ -60,6 +62,7 @@ void CPowerup::Spawn()
 	AddSolidFlags(FSOLID_NOT_SOLID | FSOLID_TRIGGER);
 	SetCollisionBoundsFromModel();
 	//SetCollisionGroup(COLLISION_GROUP_INTERACTIVE);
+	m_flEndTime = -1;
 	SetTouch(&CPowerup::OnTouchPowerup);
 }
 extern ConVar  hl2_sprintspeed;
@@ -87,8 +90,7 @@ void CPowerup::OnTouchPowerup(CBaseEntity *pOther)
 		player->SetMaxSpeed(player->GetPlayerMaxSpeed() * HastePowerupMult.GetFloat());
 		break;
 	case DAMAGE:
-		
-		player->EmitSound("AlyxEMP.Charge");
+		player->EmitSound( "SuitRecharge.Start" );
 		player->bInDamageEffect = true;
 		break;
 	case HEALTH:
@@ -104,8 +106,20 @@ void CPowerup::OnTouchPowerup(CBaseEntity *pOther)
 	}
 	pPlayer = player;
 	SetRenderColorA(0);
-	SetThink(&CPowerup::RemoveEffect);
-	SetNextThink(gpGlobals->curtime + flPowerupDuration);
+	m_flEndTime = gpGlobals->curtime + flPowerupDuration;
+	if (iEffect == DAMAGE)
+	{
+		// damage powerup has alternative behaviour
+		RegisterThinkContext( "SoundContext" );
+		RegisterThinkContext( "RemoveEffectContext" );
+		SetContextThink( &CPowerup::PlaySound, gpGlobals->curtime + 1, "SoundContext" );
+		SetContextThink( &CPowerup::RemoveEffect, m_flEndTime, "RemoveEffectContext" );
+	}
+	else
+	{
+		SetThink( &CPowerup::RemoveEffect );
+		SetNextThink( m_flEndTime );
+	}
 	cantouch = false;
 }
 
@@ -119,9 +133,28 @@ void CPowerup::RemoveEffect()
 		break;
 	case DAMAGE:
 		pPlayer->bInDamageEffect = false;
+		pPlayer->EmitSound( "SuitRecharge.Start" );
 		break;
 	}
 	UTIL_Remove(this);
+}
+
+void CPowerup::PlaySound()
+{
+	if (pPlayer->bInDamageEffect)
+	{
+		if (gpGlobals->curtime > m_flEndTime - 5 && gpGlobals->curtime < m_flEndTime)
+		{
+			// about to end
+			pPlayer->EmitSound( "ItemBattery.Touch" );
+		}
+		else
+		{
+			pPlayer->EmitSound( "SuitRecharge.Start" );
+		}
+	}
+	
+	SetNextThink( gpGlobals->curtime + 1, "SoundContext" );
 }
 #else
 IMPLEMENT_CLIENTCLASS_DT(C_Powerup, DT_PowerUp, CPowerup)
