@@ -19,6 +19,8 @@ DEFINE_KEYFIELD(iEffect, FIELD_INTEGER, "effect"),
 DEFINE_KEYFIELD(flPowerupDuration, FIELD_FLOAT, "Duration"),
 
 DEFINE_FIELD(m_flEndTime, FIELD_FLOAT),
+
+DEFINE_FIELD(pPlayer, FIELD_CLASSPTR),
 #endif
 
 
