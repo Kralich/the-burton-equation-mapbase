@@ -36,6 +36,7 @@ public:
 
 	DECLARE_SERVERCLASS();
 	
+	void	Spawn( void );
 	void	Precache( void );
 	void	AddViewKick( void );
 	void	SecondaryAttack( void );
@@ -51,7 +52,6 @@ public:
 	int		WeaponRangeAttack2Condition( float flDot, float flDist );
 	Activity	GetPrimaryAttackActivity( void );
 
-	static Vector m_vecBulletSpread;
 	virtual const Vector& GetBulletSpread( void )
 	{
 		static const Vector cone = m_vecBulletSpread;
@@ -70,6 +70,9 @@ protected:
 
 	Vector	m_vecTossVelocity;
 	float	m_flNextGrenadeCheck;
+
+private:
+	Vector	m_vecBulletSpread = vec3_invalid;
 };
 
 IMPLEMENT_SERVERCLASS_ST(CWeaponSMG1, DT_WeaponSMG1)
@@ -82,6 +85,7 @@ BEGIN_DATADESC( CWeaponSMG1 )
 
 	DEFINE_FIELD( m_vecTossVelocity, FIELD_VECTOR ),
 	DEFINE_FIELD( m_flNextGrenadeCheck, FIELD_TIME ),
+	DEFINE_FIELD( m_vecBulletSpread, FIELD_VECTOR ),
 
 END_DATADESC()
 
@@ -191,6 +195,12 @@ CWeaponSMG1::CWeaponSMG1( )
 	m_bAltFiresUnderwater = false;
 }
 
+void CWeaponSMG1::Spawn( void )
+{
+	BaseClass::Spawn();
+	SETUP_WEAPON_ACCURACY();
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -200,8 +210,6 @@ void CWeaponSMG1::Precache( void )
 
 	BaseClass::Precache();
 }
-
-Vector CWeaponSMG1::m_vecBulletSpread;
 
 //-----------------------------------------------------------------------------
 // Purpose: Give this weapon longer range when wielded by an ally NPC.
@@ -216,10 +224,6 @@ void CWeaponSMG1::Equip( CBaseCombatCharacter *pOwner )
 	{
 		m_fMaxRange1 = 1400;
 	}
-
-	// init accuracy and cache it, to avoid doing unnecessary trig
-	float flCone = sinf( GetTBEWpnData().m_flAccuracy * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
-	m_vecBulletSpread = Vector( flCone, flCone, flCone );
 
 	BaseClass::Equip( pOwner );
 }

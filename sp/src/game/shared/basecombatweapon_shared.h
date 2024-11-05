@@ -187,6 +187,17 @@ private:
 
 };
 
+// Helper functions to use with weapons that use the custom accuracy system.
+// Make sure to declare m_vecBulletSpread in the class and save it in the datadesc, and
+// do the same with m_vecBulletSpreadAlt if you're setting up an alt-fire accuracy.
+#define SETUP_WEAPON_ACCURACY()												\
+	float flCone = sinf( GetTBEWpnData().m_flAccuracy * M_PI / 360 );		\
+	m_vecBulletSpread = Vector( flCone, flCone, flCone );					\
+
+#define SETUP_WEAPON_ALT_ACCURACY()											\
+	float flConeAlt = sinf( GetTBEWpnData().m_flAccuracyAlt * M_PI / 360 );	\
+	m_vecBulletSpreadAlt = Vector( flConeAlt, flConeAlt, flConeAlt );		\
+
 //-----------------------------------------------------------------------------
 // Purpose: Client side rep of CBaseTFCombatWeapon 
 //-----------------------------------------------------------------------------

@@ -24,12 +24,12 @@ public:
 
 	CWeaponOICW();
 
+	void	Spawn( void );
 	virtual void	ItemPostFrame( void );
 	virtual void	Precache( void );
 
 	void			SecondaryAttack( void );
 	bool			Holster( CBaseCombatWeapon * pSwitchingTo );
-	virtual void	Equip( CBaseCombatCharacter *pOwner );
 	virtual bool	Reload();
 
 	const char		*GetTracerType( void ) { return "AR2Tracer"; }
@@ -54,8 +54,6 @@ public:
 
 	void	DoImpactEffect( trace_t &tr, int nDamageType );
 
-	static Vector m_vecBulletSpread;
-	static Vector m_vecBulletSpreadAlt;
 	virtual const Vector& GetBulletSpread( void )
 	{
 		static Vector cone = m_vecBulletSpread;
@@ -73,11 +71,15 @@ public:
 	DECLARE_DATADESC();
 private:
 	float	m_flScopeTime;
+	Vector	m_vecBulletSpread = vec3_invalid;
+	Vector	m_vecBulletSpreadAlt = vec3_invalid;
 };
 
 BEGIN_DATADESC(CWeaponOICW)
 	DEFINE_FIELD( m_bIsScoped, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_flScopeTime, FIELD_TIME ),
+	DEFINE_FIELD( m_vecBulletSpread, FIELD_VECTOR ),
+	DEFINE_FIELD( m_vecBulletSpreadAlt, FIELD_VECTOR ),
 END_DATADESC()
 
 IMPLEMENT_SERVERCLASS_ST(CWeaponOICW, DT_WeaponOICW)
@@ -249,6 +251,13 @@ CWeaponOICW::CWeaponOICW()
 	m_bAltFiresUnderwater = false;
 }
 
+void CWeaponOICW::Spawn( void )
+{
+	BaseClass::Spawn();
+	SETUP_WEAPON_ACCURACY();
+	SETUP_WEAPON_ALT_ACCURACY();
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Precaches weapon
 //-----------------------------------------------------------------------------
@@ -277,21 +286,6 @@ void CWeaponOICW::ItemPostFrame( void )
 
 	BaseClass::ItemPostFrame();
 
-}
-
-Vector CWeaponOICW::m_vecBulletSpread;
-Vector CWeaponOICW::m_vecBulletSpreadAlt;
-
-void CWeaponOICW::Equip( CBaseCombatCharacter *pOwner )
-{
-	// init accuracy and cache it, to avoid doing unnecessary trig
-	float flCone = sinf( GetTBEWpnData().m_flAccuracy * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
-	m_vecBulletSpread = Vector( flCone, flCone, flCone );
-
-	float flConeAlt = sinf( GetTBEWpnData().m_flAccuracyAlt * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
-	m_vecBulletSpreadAlt = Vector( flConeAlt, flConeAlt, flConeAlt );
-
-	BaseClass::Equip( pOwner );
 }
 
 //-----------------------------------------------------------------------------

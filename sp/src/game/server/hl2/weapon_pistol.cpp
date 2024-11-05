@@ -44,6 +44,7 @@ public:
 
 	DECLARE_SERVERCLASS();
 
+	void	Spawn( void );
 	void	Precache( void );
 	void	ItemPostFrame( void );
 	void	ItemPreFrame( void );
@@ -62,10 +63,8 @@ public:
 	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 	Activity	GetPrimaryAttackActivity( void );
 
-	virtual void Equip( CBaseCombatCharacter *pOwner );
 	virtual bool Reload( void );
 
-	static Vector m_vecBulletSpread;
 	virtual const Vector& GetBulletSpread( void )
 	{		
 		// Handle NPCs first
@@ -123,6 +122,7 @@ private:
 	float	m_flLastAttackTime;
 	float	m_flAccuracyPenalty;
 	int		m_nNumShotsFired;
+	Vector	m_vecBulletSpread = vec3_invalid;
 };
 
 
@@ -138,6 +138,7 @@ BEGIN_DATADESC( CWeaponPistol )
 	DEFINE_FIELD( m_flLastAttackTime,		FIELD_TIME ),
 	DEFINE_FIELD( m_flAccuracyPenalty,		FIELD_FLOAT ), //NOTENOTE: This is NOT tracking game time
 	DEFINE_FIELD( m_nNumShotsFired,			FIELD_INTEGER ),
+	DEFINE_FIELD( m_vecBulletSpread,		FIELD_VECTOR ),
 
 END_DATADESC()
 
@@ -308,7 +309,11 @@ CWeaponPistol::CWeaponPistol( void )
 	m_bFiresUnderwater	= true;
 }
 
-
+void CWeaponPistol::Spawn( void )
+{
+	BaseClass::Spawn();
+	SETUP_WEAPON_ACCURACY();
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -497,17 +502,6 @@ void CWeaponPistol::ItemPostFrame( void )
 	{
 		DryFire();
 	}
-}
-
-Vector CWeaponPistol::m_vecBulletSpread;
-
-void CWeaponPistol::Equip( CBaseCombatCharacter *pOwner )
-{
-	// init accuracy and cache it, to avoid doing unnecessary trig
-	float flCone = sinf( GetTBEWpnData().m_flAccuracy * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
-	m_vecBulletSpread = Vector( flCone, flCone, flCone );
-
-	BaseClass::Equip( pOwner );
 }
 
 //-----------------------------------------------------------------------------

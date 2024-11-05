@@ -26,6 +26,7 @@ public:
 
 	DECLARE_SERVERCLASS();
 
+	void	Spawn( void );
 	void	ItemPostFrame( void );
 	void	Precache( void );
 	
@@ -46,7 +47,6 @@ public:
 	float	GetFireRate( void ) { return GetTBEWpnData().m_flFireRate; }
 
 	bool	CanHolster( void );
-	virtual void Equip( CBaseCombatCharacter *pOwner );
 	bool	Reload( void );
 
 	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
@@ -55,7 +55,6 @@ public:
 	
 	void	DoImpactEffect( trace_t &tr, int nDamageType );
 
-	static Vector m_vecBulletSpread;
 	virtual const Vector& GetBulletSpread( void )
 	{
 		static Vector cone;
@@ -78,6 +77,9 @@ public:
 #endif
 	DECLARE_ACTTABLE();
 	DECLARE_DATADESC();
+
+private:
+	Vector	m_vecBulletSpread = vec3_invalid;
 };
 
 

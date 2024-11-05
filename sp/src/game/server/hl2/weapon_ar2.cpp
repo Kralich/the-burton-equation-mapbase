@@ -46,6 +46,7 @@ BEGIN_DATADESC( CWeaponAR2 )
 	DEFINE_FIELD( m_flDelayedFire,	FIELD_TIME ),
 	DEFINE_FIELD( m_bShotDelayed,	FIELD_BOOLEAN ),
 	//DEFINE_FIELD( m_nVentPose, FIELD_INTEGER ),
+	DEFINE_FIELD( m_vecBulletSpread, FIELD_VECTOR ),
 
 END_DATADESC()
 
@@ -217,6 +218,13 @@ CWeaponAR2::CWeaponAR2( )
 	m_bAltFiresUnderwater = false;
 }
 
+void CWeaponAR2::Spawn( void )
+{
+	BaseClass::Spawn();
+	SETUP_WEAPON_ACCURACY();
+}
+
+
 void CWeaponAR2::Precache( void )
 {
 	BaseClass::Precache();
@@ -256,17 +264,6 @@ void CWeaponAR2::ItemPostFrame( void )
 	}
 
 	BaseClass::ItemPostFrame();
-}
-
-Vector CWeaponAR2::m_vecBulletSpread;
-
-void CWeaponAR2::Equip( CBaseCombatCharacter *pOwner )
-{
-	// init accuracy and cache it, to avoid doing unnecessary trig
-	float flCone = sinf( GetTBEWpnData().m_flAccuracy * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
-	m_vecBulletSpread = Vector( flCone, flCone, flCone );
-
-	BaseClass::Equip( pOwner );
 }
 
 //-----------------------------------------------------------------------------

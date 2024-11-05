@@ -43,11 +43,11 @@ private:
 	bool	m_bDelayedFire2;	// Fire secondary when finished reloading
 
 public:
+	void	Spawn( void );
 	void	Precache( void );
 
 	int CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
 
-	static Vector m_vecBulletSpread;
 	virtual const Vector& GetBulletSpread( void )
 	{
 		static Vector vitalAllyCone = VECTOR_CONE_3DEGREES;
@@ -71,7 +71,6 @@ public:
 
 	virtual float			GetFireRate( void );
 
-	virtual void Equip( CBaseCombatCharacter *pOwner );
 	bool StartReload( void );
 	bool Reload( void );
 	void FillClip( void );
@@ -92,6 +91,9 @@ public:
 	DECLARE_ACTTABLE();
 
 	CWeaponShotgun(void);
+
+private:
+	Vector	m_vecBulletSpread = vec3_invalid;
 };
 
 IMPLEMENT_SERVERCLASS_ST(CWeaponShotgun, DT_WeaponShotgun)
@@ -105,6 +107,7 @@ BEGIN_DATADESC( CWeaponShotgun )
 	DEFINE_FIELD( m_bNeedPump, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bDelayedFire1, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bDelayedFire2, FIELD_BOOLEAN ),
+	DEFINE_FIELD( m_vecBulletSpread, FIELD_VECTOR ),
 
 END_DATADESC()
 
@@ -249,6 +252,12 @@ int GetShotgunActtableCount()
 }
 #endif
 
+void CWeaponShotgun::Spawn( void )
+{
+	BaseClass::Spawn();
+	SETUP_WEAPON_ACCURACY();
+}
+
 void CWeaponShotgun::Precache( void )
 {
 	CBaseCombatWeapon::Precache();
@@ -365,17 +374,6 @@ float CWeaponShotgun::GetFireRate()
 	}
 
 	return 0.7f;
-}
-
-Vector CWeaponShotgun::m_vecBulletSpread;
-
-void CWeaponShotgun::Equip( CBaseCombatCharacter *pOwner )
-{
-	// init accuracy and cache it, to avoid doing unnecessary trig
-	float flCone = sinf( GetTBEWpnData().m_flAccuracy * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
-	m_vecBulletSpread = Vector( flCone, flCone, flCone );
-
-	BaseClass::Equip( pOwner );
 }
 
 //-----------------------------------------------------------------------------

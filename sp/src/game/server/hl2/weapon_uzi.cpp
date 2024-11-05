@@ -44,6 +44,7 @@ public:
 
 	DECLARE_SERVERCLASS();
 	
+	void	Spawn( void );
 	void	AddViewKick( void );
 	void	SecondaryAttack( void );
 
@@ -58,8 +59,6 @@ public:
 	int		WeaponRangeAttack2Condition( float flDot, float flDist );
 	Activity	GetPrimaryAttackActivity( void );
 
-	static Vector m_vecBulletSpread;
-	static Vector m_vecBulletSpreadAlt;
 	virtual const Vector& GetBulletSpread( void )
 	{
 		static Vector cone;
@@ -102,6 +101,10 @@ protected:
 	float	m_flLastPrimaryAttack;
 	float   m_flSpreadComponent;
 	bool	m_bPrimary;
+
+private:
+	Vector	m_vecBulletSpread = vec3_invalid;
+	Vector	m_vecBulletSpreadAlt = vec3_invalid;
 };
 
 IMPLEMENT_SERVERCLASS_ST(CWeaponUZI, DT_WeaponUZI)
@@ -117,6 +120,8 @@ BEGIN_DATADESC( CWeaponUZI )
 	DEFINE_FIELD( m_flSpreadComponent, FIELD_FLOAT ),
 	DEFINE_FIELD( m_flLastPrimaryAttack, FIELD_TIME ),
 	DEFINE_FIELD(m_bPrimary, FIELD_BOOLEAN),
+	DEFINE_FIELD( m_vecBulletSpread, FIELD_VECTOR ),
+	DEFINE_FIELD( m_vecBulletSpreadAlt, FIELD_VECTOR ),
 
 END_DATADESC()
 
@@ -174,9 +179,6 @@ acttable_t	CWeaponUZI::m_acttable[] =
 
 IMPLEMENT_ACTTABLE(CWeaponUZI);
 
-Vector CWeaponUZI::m_vecBulletSpread;
-Vector CWeaponUZI::m_vecBulletSpreadAlt;
-
 //=========================================================
 CWeaponUZI::CWeaponUZI( )
 {
@@ -187,6 +189,13 @@ CWeaponUZI::CWeaponUZI( )
 	m_iClip2 = -1;
 
 	m_bAltFiresUnderwater = false;
+}
+
+void CWeaponUZI::Spawn( void )
+{
+	BaseClass::Spawn();
+	SETUP_WEAPON_ACCURACY();
+	SETUP_WEAPON_ALT_ACCURACY();
 }
 
 //-----------------------------------------------------------------------------
@@ -202,13 +211,6 @@ void CWeaponUZI::Equip( CBaseCombatCharacter *pOwner )
 	{
 		m_fMaxRange1 = 1400;
 	}
-
-	// init accuracy and cache it, to avoid doing unnecessary trig
-	float flCone = sinf( GetTBEWpnData().m_flAccuracy * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
-	m_vecBulletSpread = Vector( flCone, flCone, flCone );
-
-	float flConeAlt = sinf( GetTBEWpnData().m_flAccuracyAlt * M_PI / 360 ); // perform the same calculations as are used to find VECTOR_CONE_<X>DEGREES
-	m_vecBulletSpreadAlt = Vector( flConeAlt, flConeAlt, flConeAlt );
 
 	BaseClass::Equip( pOwner );
 }
