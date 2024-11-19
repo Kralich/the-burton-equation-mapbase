@@ -2778,7 +2778,7 @@ void CBaseCombatWeapon::PrimaryAttack( void )
 
 	info.m_flDistance = MAX_TRACE_LENGTH;
 	info.m_iAmmoType = m_iPrimaryAmmoType;
-	info.m_iTracerFreq = 2;
+	info.m_iTracerFreq = 1;
 	info.m_flDamage = GetDamageOverride();
 
 	// If the owner of this weapon is the player, use the player damage override

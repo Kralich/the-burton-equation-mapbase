@@ -230,7 +230,7 @@ void CWeaponGLOCK::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCha
 
 			WeaponSound( SINGLE_NPC );
 			// 1upD - make sure to add parameters to pOperator->FireBullets to include override damage from the weapon. The two parameters before that are no longer used, they can be 0
-			pOperator->FireBullets( 1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED, MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 2, 0, 0, GetDamageOverride() );
+			pOperator->FireBullets( 1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED, MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 1, 0, 0, GetDamageOverride() );
 			pOperator->DoMuzzleFlash();
 			m_iClip1 = m_iClip1 - 1;
 		}

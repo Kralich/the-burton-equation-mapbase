@@ -697,7 +697,7 @@ struct FireBulletsInfo_t
 		m_iShots = 1;
 		m_vecSpread.Init( 0, 0, 0 );
 		m_flDistance = 8192;
-		m_iTracerFreq = 4;
+		m_iTracerFreq = 1;
 		m_flDamage = 0;
 		m_iPlayerDamage = 0;
 		m_pAttacker = NULL;
