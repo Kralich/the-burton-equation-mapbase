@@ -40,6 +40,7 @@ public:
 	void	Precache( void );
 	void	AddViewKick( void );
 	void	SecondaryAttack( void );
+	bool    ShouldDisplayAltFireHUDHint() { return false; }
 
 	int		GetMinBurst() { return 2; }
 	int		GetMaxBurst() { return 5; }
