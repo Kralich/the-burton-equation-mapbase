@@ -69,8 +69,8 @@ ConVar physcannon_dmg_glass( "physcannon_dmg_glass", "15" );
 ConVar physcannon_right_turrets( "physcannon_right_turrets", "0" );
 
 #ifdef MAPBASE
-ConVar sv_player_enable_propsprint("sv_player_enable_propsprint", "0", FCVAR_NONE, "If enabled, allows the player to sprint while holding a physics object" );
-ConVar sv_player_enable_gravgun_sprint("sv_player_enable_gravgun_sprint", "0", FCVAR_NONE, "Enables the player to sprint while holding a phys. object with the gravity gun" );
+ConVar sv_player_enable_propsprint("sv_player_enable_propsprint", "1", FCVAR_NONE, "If enabled, allows the player to sprint while holding a physics object" );
+ConVar sv_player_enable_gravgun_sprint("sv_player_enable_gravgun_sprint", "1", FCVAR_NONE, "Enables the player to sprint while holding a phys. object with the gravity gun" );
 #endif
 extern ConVar hl2_normspeed;
 extern ConVar hl2_walkspeed;
