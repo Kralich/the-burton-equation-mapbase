@@ -41,10 +41,11 @@ END_SEND_TABLE();
 void CPowerup::Spawn()
 {
 	BaseClass::Spawn();
-	PrecacheScriptSound("SuitRecharge.Start");
-	PrecacheScriptSound("AlyxEMP.Charge");
-	PrecacheScriptSound("WallHealth.Start");
-	PrecacheScriptSound( "ItemBattery.Touch" );
+	PrecacheScriptSound("Powerup.Health_Pickup");
+	PrecacheScriptSound("Powerup.Damage_Pickup");
+	PrecacheScriptSound("Powerup.Damage_Countdown");
+	PrecacheScriptSound("Powerup.Damage_CountdownFinal");
+	PrecacheScriptSound("Powerup.Damage_End");
 
 	switch (iEffect)
 	{
@@ -92,11 +93,11 @@ void CPowerup::OnTouchPowerup(CBaseEntity *pOther)
 		player->SetMaxSpeed(player->GetPlayerMaxSpeed() * HastePowerupMult.GetFloat());
 		break;
 	case DAMAGE:
-		player->EmitSound( "SuitRecharge.Start" );
+		player->EmitSound( "Powerup.Damage_Pickup" );
 		player->bInDamageEffect = true;
 		break;
 	case HEALTH:
-		player->EmitSound("WallHealth.Start");
+		player->EmitSound("Powerup.Health_Pickup");
 		player->SetHealth(Healthpowerupset.GetInt());
 		break;
 	}
@@ -135,7 +136,7 @@ void CPowerup::RemoveEffect()
 		break;
 	case DAMAGE:
 		pPlayer->bInDamageEffect = false;
-		pPlayer->EmitSound( "SuitRecharge.Start" );
+		pPlayer->EmitSound( "Powerup.Damage_End" );
 		break;
 	}
 	UTIL_Remove(this);
@@ -148,11 +149,11 @@ void CPowerup::PlaySound()
 		if (gpGlobals->curtime > m_flEndTime - 5 && gpGlobals->curtime < m_flEndTime)
 		{
 			// about to end
-			pPlayer->EmitSound( "ItemBattery.Touch" );
+			pPlayer->EmitSound( "Powerup.Damage_Countdown" );
 		}
 		else
 		{
-			pPlayer->EmitSound( "SuitRecharge.Start" );
+			pPlayer->EmitSound( "Powerup.Damage_CountdownFinal" );
 		}
 	}
 	
