@@ -258,6 +258,10 @@ void CWeaponGLOCK::DryFire( void )
 //-----------------------------------------------------------------------------
 void CWeaponGLOCK::PrimaryAttack( void )
 {
+	// suppress weird m1+m2 stuff
+	if (m_iBurstSize > 0)
+		return;
+
 	if ( ( gpGlobals->curtime - m_flLastAttackTime ) > 0.5f )
 	{
 		m_nNumShotsFired = 0;
@@ -289,6 +293,8 @@ void CWeaponGLOCK::PrimaryAttack( void )
 
 	m_iPrimaryAttacks++;
 	gamestats->Event_WeaponFired( pOwner, true, GetClassname() );
+
+	m_flNextSecondaryAttack = gpGlobals->curtime + GetFireRate();
 }
 
 void CWeaponGLOCK::SecondaryAttack() {
