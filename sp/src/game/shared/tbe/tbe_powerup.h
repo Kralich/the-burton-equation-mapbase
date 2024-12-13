@@ -4,6 +4,7 @@ class CPowerup : public CBaseAnimating
 {
 public:
 	void Spawn();
+	virtual void Precache();
 	void RemoveEffect();
 	void PlaySound();
 	CBasePlayer* pPlayer;

@@ -41,24 +41,11 @@ END_SEND_TABLE();
 void CPowerup::Spawn()
 {
 	BaseClass::Spawn();
-	PrecacheScriptSound("Powerup.Health_Pickup");
-	PrecacheScriptSound("Powerup.Damage_Pickup");
-	PrecacheScriptSound("Powerup.Damage_Countdown");
-	PrecacheScriptSound("Powerup.Damage_CountdownFinal");
-	PrecacheScriptSound("Powerup.Damage_End");
 
-	switch (iEffect)
-	{
-	case HASTE:
-		SetModel("models/items/powerups/Goldenshoes.mdl");
-		break;
-	case DAMAGE:
-		SetModel("models/items/powerups/Goldengun.mdl");
-		break;
-	case HEALTH:
-		SetModel("models/items/powerups/Goldenhat.mdl");
-		break;
-	};
+	Precache();
+
+	SetModel( STRING( GetModelName() ) );
+
 	SetRenderMode(kRenderTransColor);
 	vIntial = GetAbsOrigin();
 	SetSolid(SOLID_BBOX);
@@ -68,6 +55,32 @@ void CPowerup::Spawn()
 	m_flEndTime = -1;
 	SetTouch(&CPowerup::OnTouchPowerup);
 }
+
+void CPowerup::Precache( void )
+{
+	BaseClass::Precache();
+	PrecacheScriptSound( "Powerup.Health_Pickup" );
+	PrecacheScriptSound( "Powerup.Damage_Pickup" );
+	PrecacheScriptSound( "Powerup.Damage_Countdown" );
+	PrecacheScriptSound( "Powerup.Damage_CountdownFinal" );
+	PrecacheScriptSound( "Powerup.Damage_End" );
+
+	switch (iEffect)
+	{
+	case HASTE:
+		SetModelName( AllocPooledString( "models/items/powerups/Goldenshoes.mdl" ) );
+		break;
+	case DAMAGE:
+		SetModelName( AllocPooledString( "models/items/powerups/Goldengun.mdl" ) );
+		break;
+	case HEALTH:
+		SetModelName( AllocPooledString( "models/items/powerups/Goldenhat.mdl" ) );
+		break;
+	};
+
+	PrecacheModel( STRING( GetModelName() ) );
+}
+
 extern ConVar  hl2_sprintspeed;
 extern ConVar  hl2_normspeed;
 
