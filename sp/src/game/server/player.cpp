@@ -4220,7 +4220,7 @@ void CBasePlayer::CheckTimeBasedDamage()
 					TakeHealth(nDif, DMG_GENERIC);
 					m_nPoisonRestored += nDif;
 				}
-				bDuration = 9;	// get up to 10*10 = 100 points back
+				bDuration = 14;	// get up to 10*15 = 150 points back
 				break;
 			}
 
@@ -7326,7 +7326,7 @@ void CBasePlayer::UpdateClientData( void )
 	// update the client with our poison state
 	m_Local.m_bPoisoned = ( m_bitsDamageType & DMG_POISON ) 
 						&& ( m_nPoisonDmg > m_nPoisonRestored ) 
-						&& ( m_iHealth < 100 );
+						&& ( m_iHealth < 150 );
 
 	// Check if the bonus progress HUD element should be displayed
 	if ( m_iBonusChallenge == 0 && m_iBonusProgress == 0 && !( m_Local.m_iHideHUD & HIDEHUD_BONUS_PROGRESS ) )
