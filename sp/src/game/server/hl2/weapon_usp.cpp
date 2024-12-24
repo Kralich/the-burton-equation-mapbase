@@ -190,6 +190,7 @@ CWeaponUSP::CWeaponUSP( void )
 	m_fMaxRange2		= 200;
 
 	m_bFiresUnderwater	= true;
+	m_bAltFiresUnderwater = true;
 }
 
 void CWeaponUSP::Spawn( void )
