@@ -4344,9 +4344,11 @@ void CHL2_Player::HandleKickAttack()
 	if ( !sv_player_kick_attack_enabled.GetBool() && !IsInAVehicle() )
 		return;
 
+	DevMsg( "%f %f %f\n", gpGlobals->curtime, GetNextAttack(), m_flNextKickAttack );
 	// Door kick!
-	if ( gpGlobals->curtime >= m_flNextAttack && gpGlobals->curtime >= m_flNextKickAttack && !IsInAVehicle() && m_nButtons & IN_ALT1 )
+	if ( gpGlobals->curtime >= m_flNextKickAttack && !IsInAVehicle() && m_nButtons & IN_ALT1 )
 	{
+		DevMsg( "hi\n" );
 		// Viewpunch
 		QAngle punchAng;
 		punchAng.x = random->RandomFloat( 4.0f, 5.0f );
