@@ -315,7 +315,7 @@ void CBaseHLBludgeonWeapon::Swing( int bIsSecondary )
 
 	Vector swingEnd = swingStart + forward * GetRange();
 	UTIL_TraceLine( swingStart, swingEnd, MASK_SHOT_HULL, pOwner, COLLISION_GROUP_NONE, &traceHit );
-	Activity nHitActivity = ACT_VM_HITCENTER;
+	Activity nHitActivity = bIsSecondary ? ACT_VM_HITCENTER2 : ACT_VM_HITCENTER;
 
 	// Like bullets, bludgeon traces have to trace against triggers.
 	CTakeDamageInfo triggerInfo( GetOwner(), GetOwner(), GetDamageForActivity( nHitActivity ), DMG_CLUB );
@@ -374,7 +374,10 @@ void CBaseHLBludgeonWeapon::Swing( int bIsSecondary )
 
 #ifdef MAPBASE
 		// Sound has been moved here since we're using the other melee sounds now
-		WeaponSound( SINGLE );
+		if (!bIsSecondary)
+			WeaponSound( SINGLE );
+		else
+			WeaponSound( SPECIAL2 );
 #endif
 		
 		// See if we happened to hit water
@@ -384,12 +387,22 @@ void CBaseHLBludgeonWeapon::Swing( int bIsSecondary )
 	{
 #ifdef MAPBASE
 		// Other melee sounds
-		if (traceHit.m_pEnt && traceHit.m_pEnt->IsWorld())
-			WeaponSound(MELEE_HIT_WORLD);
-		else if (traceHit.m_pEnt && !traceHit.m_pEnt->PassesDamageFilter(triggerInfo))
-			WeaponSound(MELEE_MISS);
+		if (!bIsSecondary)
+		{
+			if (traceHit.m_pEnt && traceHit.m_pEnt->IsWorld())
+				WeaponSound( MELEE_HIT_WORLD );
+			else if (traceHit.m_pEnt && !traceHit.m_pEnt->PassesDamageFilter( triggerInfo ))
+				WeaponSound( MELEE_MISS );
+			else
+				WeaponSound( MELEE_HIT );
+		}
 		else
-			WeaponSound(MELEE_HIT);
+		{
+			if (traceHit.m_pEnt && !traceHit.m_pEnt->PassesDamageFilter( triggerInfo ))
+				WeaponSound( SPECIAL2 );
+			else
+				WeaponSound( SPECIAL3 );
+		}
 #endif
 
 		Hit( traceHit, nHitActivity, bIsSecondary ? true : false );

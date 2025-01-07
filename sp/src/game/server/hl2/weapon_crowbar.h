@@ -28,6 +28,7 @@ class CWeaponCrowbar : public CBaseHLBludgeonWeapon
 {
 public:
 	DECLARE_CLASS( CWeaponCrowbar, CBaseHLBludgeonWeapon );
+	DECLARE_DATADESC();
 
 	DECLARE_SERVERCLASS();
 	DECLARE_ACTTABLE();
@@ -37,11 +38,18 @@ public:
 	float		GetRange( void )		{	return	CROWBAR_RANGE;	}
 	float		GetFireRate( void )		{	return	CROWBAR_REFIRE;	}
 
+	virtual void Precache( void );
+
 	void		AddViewKick( void );
 	float		GetDamageForActivity( Activity hitActivity );
 
 	virtual int WeaponMeleeAttack1Condition( float flDot, float flDist );
-	void		SecondaryAttack( void )	{	return;	}
+	void		SecondaryAttack( void );
+
+	virtual void ItemPostFrame( void );
+
+	bool		IsFullyCharged( void ) { return gpGlobals->curtime - m_flChargeStartTime >= 2.0f; }
+	void		ChargedAttack( void );
 
 	// Animation event
 	virtual void Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
@@ -55,6 +63,9 @@ public:
 private:
 	// Animation event handlers
 	void HandleAnimEventMeleeHit( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
+
+	bool m_bIsCharging;
+	float m_flChargeStartTime;
 };
 
 #endif // WEAPON_CROWBAR_H

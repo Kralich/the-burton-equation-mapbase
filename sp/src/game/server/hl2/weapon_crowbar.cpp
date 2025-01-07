@@ -69,11 +69,22 @@ acttable_t CWeaponCrowbar::m_acttable[] =
 
 IMPLEMENT_ACTTABLE(CWeaponCrowbar);
 
+BEGIN_DATADESC( CWeaponCrowbar )
+DEFINE_FIELD( m_bIsCharging, FIELD_BOOLEAN ),
+DEFINE_FIELD( m_flChargeStartTime, FIELD_TIME ),
+END_DATADESC()
+
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
 CWeaponCrowbar::CWeaponCrowbar( void )
 {
+	m_bIsCharging = false;
+}
+
+void CWeaponCrowbar::Precache( void )
+{
+	BaseClass::Precache();
 }
 
 //-----------------------------------------------------------------------------
@@ -83,8 +94,14 @@ CWeaponCrowbar::CWeaponCrowbar( void )
 //-----------------------------------------------------------------------------
 float CWeaponCrowbar::GetDamageForActivity( Activity hitActivity )
 {
-	if ( ( GetOwner() != NULL ) && ( GetOwner()->IsPlayer() ) )
+	if ((GetOwner() != NULL) && (GetOwner()->IsPlayer()))
+	{
+		if (hitActivity == ACT_VM_HITCENTER2)
+			return sk_plr_dmg_crowbar.GetFloat() * 3;
+
 		return sk_plr_dmg_crowbar.GetFloat();
+	}
+		
 
 	return sk_npc_dmg_crowbar.GetFloat();
 }
@@ -159,6 +176,57 @@ int CWeaponCrowbar::WeaponMeleeAttack1Condition( float flDot, float flDist )
 	return COND_CAN_MELEE_ATTACK1;
 }
 
+void CWeaponCrowbar::SecondaryAttack( void )
+{
+	if (!m_bIsCharging)
+	{
+		WeaponSound( WPN_DOUBLE );
+		SendWeaponAnim( ACT_VM_HAULBACK );
+		m_bIsCharging = true;
+		m_flChargeStartTime = gpGlobals->curtime;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Fidget Animation Stuff
+//-----------------------------------------------------------------------------
+void CWeaponCrowbar::ItemPostFrame( void )
+{
+	CBasePlayer *pPlayer = ToBasePlayer( GetOwner() );
+
+	if (!pPlayer)
+		return;
+
+	if (m_bIsCharging && IsFullyCharged() && GetActivity() != ACT_VM_PULLBACK)
+	{
+		WeaponSound( SPECIAL1 );
+		SendWeaponAnim( ACT_VM_PULLBACK );
+	}
+
+	if (m_bIsCharging && pPlayer->m_afButtonReleased & IN_ATTACK2)
+	{
+		if (IsFullyCharged())
+		{
+			ChargedAttack();
+		}
+		else
+		{
+			StopWeaponSound( WPN_DOUBLE );
+			SendWeaponAnim( ACT_VM_IDLE );
+			m_bIsCharging = false;
+			m_flNextSecondaryAttack = gpGlobals->curtime + 0.5;
+		}
+	}
+
+	BaseClass::ItemPostFrame();
+}
+
+void CWeaponCrowbar::ChargedAttack( void )
+{
+	BaseClass::SecondaryAttack();
+	m_flNextSecondaryAttack = gpGlobals->curtime + 1;
+	m_bIsCharging = false;
+}
 
 //-----------------------------------------------------------------------------
 // Animation event handlers
