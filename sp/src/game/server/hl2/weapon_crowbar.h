@@ -48,7 +48,7 @@ public:
 
 	virtual void ItemPostFrame( void );
 
-	bool		IsFullyCharged( void ) { return gpGlobals->curtime - m_flChargeStartTime >= 2.0f; }
+	bool		IsFullyCharged( void ) { return gpGlobals->curtime - m_flChargeStartTime >= 1.5f; }
 	void		ChargedAttack( void );
 
 	// Animation event
