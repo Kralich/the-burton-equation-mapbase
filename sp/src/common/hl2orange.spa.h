@@ -288,17 +288,17 @@ extern "C" {
 #define ACHIEVEMENT_TF_LAST_ORANGEBOX				150
 
 //TBE Achievements
-#define ACHIEVEMENT_FABREEN_NOIR                            151
-#define ACHIEVEMENT_APC_40S								152
-#define ACHIEVEMENT_HELICOPTER_80S                           153
-#define ACHIEVEMENT_STRIDERS_2010S					154
-#define ACHIEVEMENT_FABREEN_TERMINUS                        155
-#define ACHIEVEMENT_BEAT_20S							156
-#define ACHIEVEMENT_BEAT_40S                           157
-#define ACHIEVEMENT_BEAT_80S							158
-#define ACHIEVEMENT_BEAT_2010S                           159
-#define ACHIEVEMENT_FIND_GWOMAN							160
-#define ACHIEVEMENT_FIND_BELORYANNS                          161
+#define ACHIEVEMENT_TBE_FABREEN_NOIR                            151
+#define ACHIEVEMENT_TBE_APC_40S								152
+#define ACHIEVEMENT_TBE_HELICOPTER_80S                           153
+#define ACHIEVEMENT_TBE_STRIDERS_2010S					154
+#define ACHIEVEMENT_TBE_FABREEN_TERMINUS                        155
+#define ACHIEVEMENT_TBE_BEAT_20S							156
+#define ACHIEVEMENT_TBE_BEAT_40S                           157
+#define ACHIEVEMENT_TBE_BEAT_80S							158
+#define ACHIEVEMENT_TBE_BEAT_2010S                           159
+#define ACHIEVEMENT_TBE_GWOMAN							160
+#define ACHIEVEMENT_TBE_BELORYANN                          161
 
 //
 // Stats view ids
