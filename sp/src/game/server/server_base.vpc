@@ -677,6 +677,8 @@ $Project
 		//Haptics
 		$File	"$SRCDIR\public\haptics\haptic_msgs.cpp"
 		$File	"$SRCDIR\public\haptics\haptic_utils.cpp"	[$WIN32]
+		//TBE Achievements
+		$File	"achievements_tbe.cpp"
 
 		// Not using precompiled header cbase.h
 
